@@ -46,10 +46,10 @@ class Like(models.Model):
 
 #  follower
 
-class following(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
-
-class followers(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    followers = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
+# class following(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+#
+# class followers(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     followers = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
