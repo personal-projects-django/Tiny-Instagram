@@ -9,7 +9,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email','password','password2']
+        fields = ['username', 'email','phone','password','password2']
         extra_kwargs = {'password':{'write_only':True}}
 
 
@@ -23,7 +23,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('username can not be password')
         return value
 
-    def validate_password(self, data):
+    def validate(self, data):
+
         if data['password'] != data['password2']:
             raise serializers.ValidationError('passwords must match')
         return data
