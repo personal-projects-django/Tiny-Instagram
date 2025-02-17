@@ -3,8 +3,8 @@ from . import views
 from django.contrib.auth.views import  PasswordChangeView, PasswordChangeDoneView
 
 urlpatterns = [
-    # path('', views.UserRegisterView.as_view(), name='register'),
-    path('', views.Home.as_view(), name='home'),
+    path('', views.UserRegisterView.as_view(), name='register'),
+    # path('', views.Home.as_view(), name='home'),
 
 
 

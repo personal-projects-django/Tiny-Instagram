@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .managers import UserManager
 from django.core.validators import RegexValidator
 
+#    User
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True,verbose_name="Email")
@@ -25,15 +26,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f'{self.email}, ( {self.username} )'
 
 
+#   OTP
 
 class OTP(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    email = models.EmailField(unique=True, verbose_name="Email")
     code = models.CharField(max_length=6, verbose_name="OTP Code")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.code}, ( {self.user} )'
-
+        return f'{self.email}, ( {self.code} ),{self.created_at}'
 
 
 #      Profile
