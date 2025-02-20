@@ -16,7 +16,8 @@ class Home(APIView):
 
 class UserRegisterView(APIView):
     def post(self, request):
-        serializer = UserRegisterSerializer(data=request.POST)
+        print(request.data)
+        serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.create(serializer.validated_data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

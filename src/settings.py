@@ -43,8 +43,10 @@ INSTALLED_APPS = [
     'post.apps.PostConfig',
     'notification.apps.NotificationConfig',
     'story.apps.StoryConfig',
+    # 'phonenumber_field',
     'rest_framework',
     'rest_framework.authtoken',
+
 
 ]
 
@@ -149,3 +151,10 @@ INTERNAL_IPS = [
 
 
 AUTH_USER_MODEL = 'account.User'
+
+# REST_FRAMEWORK
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':[
+        'rest_framework.authentication.TokenAuthentication',
+    ]}

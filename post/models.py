@@ -11,12 +11,15 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     caption = models.TextField()
     image = models.ImageField(upload_to='img/posts/')
+    is_active = models.BooleanField(default=True)
+    is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # share = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.caption}, {self.user}, {self.created_at}'
+        return (f'{self.caption}, {self.user}, {self.is_active},'
+                f' {self.is_public}, {self.created_at}, {self.updated_at}')
 
 
 #  Comment
