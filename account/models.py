@@ -26,6 +26,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f'{self.email}, ( {self.username} )'
 
 
+
+
 #   OTP
 
 class OTP(models.Model):
