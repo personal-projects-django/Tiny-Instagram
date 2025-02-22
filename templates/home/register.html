@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <title>ثبت‌نام</title>
+</head>
+<body>
+    <h1>ثبت‌نام</h1>
+    <form id="registerForm">
+        <input type="text" id="username" name="username" placeholder="نام کاربری"><br>
+        <input type="email" id="email" name="email" placeholder="ایمیل"><br>
+        <input type="password" id="password" name="password" placeholder="رمز عبور"><br>
+        <input type="password" id="password2" name="password2" placeholder="تکرار رمز عبور"><br>
+        <input type="submit" value="submit" id="ادامه">
+    </form>
+</body>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    let username = document.getElementById('username').value;
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+    let password2 = document.getElementById('password2').value;
+
+    let response = await fetch('http://127.0.0.1:8000/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password ,password2})
+    })
+
+    {#let result = await response.json();#}
+    {#alert(result.message || result.error);#}
+
+
+    .then(response => response.json())
+    .then(data => window.location.replace('http://127.0.0.1:8000/'))
+            .catch(error =>{
+                console.log(error)
+            })
+
+});
+
+            {#e.preventDefault();#}
+            {#fetch("http://127.0.0.1:8000/register/", {#}
+            {##}
+            {#    headers: { "Content-Type": "application/json" },#}
+            {#    body: JSON.stringify({#}
+            {#        username: document.getElementById("username").value,#}
+            {#        email: document.getElementById("email").value,#}
+            {#        password1: document.getElementById("password1").value,#}
+            {#        password2: document.getElementById("password2").value#}
+            {#    })#}
+
+            {#.then(response => response.json())#}
+            {#.then(data => {#}
+                {#if (data.message) {#}
+                {#    alert(data.message);#}
+                {#    window.location.replace('http://127.0.0.1:8000/verify-otp/' + document.getElementById("email").value;)#}
+        {#        } else {#}
+        {#            alert("خطا: " + JSON.stringify(data));#}
+        {#        }#}
+        {#    });#}
+
+    </script>
+</html>

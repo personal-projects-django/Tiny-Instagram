@@ -3,15 +3,16 @@ from django.views import View
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import OTP
+from .models import User
 from utils import send_otp_code
 from .serializers import UserRegisterSerializer
 import random
+from django.core.mail import send_mail
+
 # Create your views here.
 
-class Home(APIView):
-    def get(self, request):
-        return Response({'message': 'Hello World!'})
+# class Home(View):
+#     template_name = 'account/base.html'
 
 
 class UserRegisterView(APIView):
@@ -44,9 +45,73 @@ class UserRegisterView(APIView):
 
 
 
-# class userregister(View):
-#     def get(self, request):
-#
-#
+# class UserRegisterView(APIView):
 #     def post(self, request):
+#         serializer = UserRegisterSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.save()
+#             send_mail(
+#                 'Your OTP Code',
+#                 f'Your OTP Code is: {user.otp}',
+#                 'noreply@example.com',
+#                 [user.email],
+#                 fail_silently=False,
+#             )
+#             return Response({'message': 'OTP sent to email'}, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyOTPAPIView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        otp = request.data.get('otp')
+
+        user = User.objects.filter(email=email, otp=otp).first()
+        if user:
+            user.otp = None  # حذف OTP بعد از تأیید موفق
+            user.save()
+            return Response({'message': 'ثبت‌نام با موفقیت انجام شد!'}, status=status.HTTP_200_OK)
+        return Response({'error': 'کد OTP اشتباه است!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# class VerifyOTPAPIView(APIView):
+#     def post(self, request):
+#         email = request.data.get('email')
+#         otp = request.data.get('otp')
+#         user = User.objects.filter(email=email, otp=otp).first()
+#         if user:
+#             user.otp = None
+#             user.save()
+#             return Response({'message': 'Registration complete'}, status=status.HTTP_200_OK)
+#         return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+
+# class LoginWithOTPAPIView(APIView):
+#     def post(self, request):
+#         email = request.data.get('email')
+#         user = User.objects.filter(email=email).first()
 #
+#         if user:
+#             user.generate_otp()
+#             send_mail(
+#                 'Login OTP Code',
+#                 f'Your OTP Code is: {user.otp}',
+#                 'noreply@example.com',
+#                 [user.email],
+#                 fail_silently=False,
+#             )
+#             return Response({'message': 'OTP sent to email'}, status=status.HTTP_200_OK)
+#         return Response({'error': 'کاربری با این ایمیل وجود ندارد!'}, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# class VerifyLoginOTPAPIView(APIView):
+#     def post(self, request):
+#         email = request.data.get('email')
+#         otp = request.data.get('otp')
+#         user = User.objects.filter(email=email, otp=otp).first()
+#
+#         if user:
+#             user.otp = None
+#             user.save()
+#             return Response({'message': 'ورود موفقیت‌آمیز!', 'username': user.username}, status=status.HTTP_200_OK)
+#         return Response({'error': 'کد OTP اشتباه است!'}, status=status.HTTP_400_BAD_REQUEST)

@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,7 +27,9 @@ urlpatterns = [
     # path('',include('notification.urls')),
     # path('',include('story.urls')),
 
-
+    path('', TemplateView.as_view(template_name='home/base.html'), name='base'),
+    path('add/', TemplateView.as_view(template_name='home/register.html'), name='add'),
+    path('otp/', TemplateView.as_view(template_name='home/verify-otp.html'), name='otp'),
 
 ]
 

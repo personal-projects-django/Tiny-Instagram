@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <title>ورود با OTP</title>
+</head>
+<body>
+    <h1>ورود</h1>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="ایمیل"><br>
+        <button type="submit">ارسال کد</button>
+    </form>
+
+    <script>
+        document.getElementById("loginForm").onsubmit = function(e) {
+            e.preventDefault();
+            fetch("http://127.0.0.1:8000/account/login-otp/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: document.getElementById("email").value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.href = 'verify-login.html?email=' + document.getElementById("email").value;
+                } else {
+                    alert("خطا: " + data.error);
+                }
+            });
+        };
+    </script>
+</body>
+</html>

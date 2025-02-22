@@ -15,7 +15,20 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         del validated_data['password2']
-        return User.objects.create_user(**validated_data)
+        User.objects.create_user(**validated_data)
+        return validated_data
+        # user.generate_otp()
+
+
+    # def create(self, validated_data):
+    #     user = User.objects.create(
+    #         username=validated_data['username'],
+    #         email=validated_data['email']
+    #     )
+    #     user.set_password(validated_data['password'])
+    #     user.generate_otp()
+    #     return user
+    #
 
 
     def validate_username(self, value):

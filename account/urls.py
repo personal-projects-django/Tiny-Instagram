@@ -1,13 +1,19 @@
+from tempfile import template
+
 from django.urls import path
 from . import views
 from django.contrib.auth.views import  PasswordChangeView, PasswordChangeDoneView
-
+from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
 
 
 urlpatterns = [
-    path('', views.UserRegisterView.as_view(), name='register'),
+    # path('', TemplateView.as_view(template_name='home/base.html'), name='base'),
+    # path('add', TemplateView.as_view(template_name='home/register.html'), name='add'),
+    path('register/', views.UserRegisterView.as_view(), name='register'),
+    path('verify-otp/', views.VerifyOTPAPIView.as_view(), name='verify-otp'),
+    # path('verify-otp/', views.LoginWithOTPAPIView.as_view(), name='verify-otp'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('', views.Home.as_view(), name='home'),

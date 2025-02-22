@@ -1,18 +1,75 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>Title</title>#}
+{#</head>#}
+{##}
+{#<header>#}
+{#    {% include 'home/header.html' %}#}
+{#</header>#}
+{#<body class="h-full w-full font-Mulish">#}
+{##}
+{#    <h1>خوش آمدید</h1>#}
+{#    <div> <a href="http://127.0.0.1:8000/add/">register</a></div>#}
+{#    <button onclick="window.location.href='login.html'">ورود</button>#}
+{##}
+{#<main>#}
+{#    {% block main %}#}
+{#    {% endblock %}#}
+{#</main>#}
+{##}
+{#</body>#}
+{#</html>#}
+
+
+{#index.html#}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<body>
 
-<header>
-    {% include 'home/header.html' %}
-</header>
-<body class="h-full w-full font-Mulish">
-<main>
-    {% block main %}
-    {% endblock %}
-</main>
+
+    <h1>{% if user.is_authenticated %} Logged in {% else %} No logged in {% endif %}</h1>
+
+<h1>All books   <a style="width: 100px; height: 50px" href="http://127.0.0.1:8000/add/">Add new book</a> </h1>
+
+    <div id="all_books">
+
+    </div>
+
+
+
 
 </body>
-</html>
+{##}
+{#<script>#}
+{##}
+{#    booksElement = document.getElementById('all_books')#}
+{##}
+{#    async function fetchAllBooks(){#}
+{#        const response = await fetch('http://127.0.0.1:8000/register/')#}
+{#        const books = await response.json()#}
+{##}
+{#        for (let book in books){#}
+{#            booksElement.innerHTML +=#}
+{#            `#}
+{#                <h3>Title: ${books[book].title}</h3>#}
+{#                <h3>ISBN: ${books[book].isbn}</h3>#}
+{#                <hr>#}
+{#            `#}
+{#        }#}
+{#    }#}
+{#    fetchAllBooks()#}
+{##}
+{##}
+{##}
+{##}
+{#</script>#}
+{##}
+{#</html>#}
+{##}
+{##}

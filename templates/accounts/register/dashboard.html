@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; direction: rtl; }
+        .container { max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
+        button { margin: 10px; padding: 10px 15px; border: none; background: #007bff; color: white; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>به داشبورد خوش آمدید</h1>
+        <p id="welcomeMessage">...</p>
+        <button onclick="goToProfile()">پروفایل</button>
+        <button onclick="goToPosts()">پست‌ها</button>
+        <button onclick="goToExplore()">اکسپلور</button>
+        <button onclick="logout()">خروج</button>
+    </div>
+
+    <script>
+        // دریافت نام کاربر از localStorage
+        let username = localStorage.getItem("username");
+        if (!username) {
+            alert("لطفاً ابتدا وارد شوید!");
+            window.location.href = "register.html";
+        } else {
+            document.getElementById("welcomeMessage").innerText = `سلام ${username}!`;
+        }
+
+        function goToProfile() {
+            window.location.href = "profile.html";
+        }
+
+        function goToPosts() {
+            window.location.href = "posts.html";
+        }
+
+        function goToExplore() {
+            window.location.href = "explore.html";
+        }
+
+        function logout() {
+            localStorage.removeItem("username");
+            alert("از حساب خارج شدید.");
+            window.location.href = "register.html";
+        }
+    </script>
+</body>
+</html>
