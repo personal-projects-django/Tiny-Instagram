@@ -29,7 +29,8 @@ urlpatterns = [
 
     path('', TemplateView.as_view(template_name='home/base.html'), name='base'),
     path('add/', TemplateView.as_view(template_name='home/register.html'), name='add'),
-    path('otp/', TemplateView.as_view(template_name='home/verify-otp.html'), name='otp'),
+    path('otp/', TemplateView.as_view(template_name='home/verify_otp.html'), name='otp'),
+    path('log/', TemplateView.as_view(template_name='home/login.html'), name='log'),
 
 ]
 

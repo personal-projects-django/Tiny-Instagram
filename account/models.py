@@ -15,6 +15,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                  message='The entered phone number format is incorrect.')
     phone = models.CharField(validators=[phone_regex], max_length=11, blank=True, verbose_name="Phone number")
     otp = models.CharField(max_length=6, blank=True, null=True)
+    is_verified = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,7 +29,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f'{self.email}, ( {self.username} )'
 
     def generate_otp(self):
-        self.otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        self.otp = str(random.randint(100000, 999999))
         self.save()
 
 #   OTP

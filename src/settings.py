@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    # 'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'account.apps.AccountConfig',
@@ -171,19 +171,21 @@ REST_FRAMEWORK = {
 
 }
 
+#    JWT
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=50),
-    "AUTH_HEADER_TYPES": ("Bearer",),
-}
+# SIMPLE_JWT = {
+#     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+#     "REFRESH_TOKEN_LIFETIME": timedelta(days=50),
+#     "AUTH_HEADER_TYPES": ("Bearer",),
+# }
+#
 
-
-#  email
+#  email account
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mohammadrezajavaherykian@gmail.com'
+EMAIL_HOST_PASSWORD = 'bxkvbwajhlqhamez'
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_email@gmail.com'  # جایگزین کنید
-EMAIL_HOST_PASSWORD = 'your_app_password'
+DEFAULT_FROM_EMAIL = 'TinyInstagram <<EMAIL>>'
