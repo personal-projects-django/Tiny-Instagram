@@ -13,10 +13,14 @@ urlpatterns = [
     # path('add', TemplateView.as_view(template_name='home/register.html'), name='add'),
     path('register/', views.UserRegisterView.as_view(), name='register'),
     path('verify_otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
+    path('resend_otp/', views.ResendOTPView.as_view(), name='resend_otp'),
     path('login/', views.UserLoginView.as_view(), name='login'),
+
+
+    # TOKEN JWT
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # path('', views.Home.as_view(), name='home'),
+
 
 
 

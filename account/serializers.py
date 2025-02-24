@@ -18,6 +18,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         del validated_data['password2']
         user = User.objects.create_user(**validated_data)
         user.generate_otp()
+        user.set_password(validated_data['password'])
+        user.save()
         return user
 
     # def create(self, validated_data):
@@ -42,9 +44,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('passwords must match')
         return data
 
+
+
+
 class UserVerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    otp = serializers.CharField()
+    otp = serializers.CharField(max_length=6)
 
 
 

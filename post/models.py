@@ -22,6 +22,14 @@ class Post(models.Model):
                 f' {self.is_public}, {self.created_at}, {self.updated_at}')
 
 
+# class PostFile(models.Model):
+#     post = models.ForeignKey(to='post.Post', on_delete=models.CASCADE)
+#     file = models.FileField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+
+
+
 #  Comment
 
 class Comment(models.Model):

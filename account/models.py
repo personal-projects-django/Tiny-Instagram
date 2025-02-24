@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .managers import UserManager
 from django.core.validators import RegexValidator
 import random
-
+from datetime import datetime, timedelta
 #    User
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -30,13 +30,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def generate_otp(self):
         self.otp = str(random.randint(100000, 999999))
+        self.otp_created_at = datetime.now()
         self.save()
+
+    def is_otp_valid(self):
+        if self.otp_created_at:
+            return datetime.now() - self.otp_created_at <= timedelta(minutes=1)
+        return False
 
 #   OTP
 
 class OTP(models.Model):
     email = models.EmailField(unique=True, verbose_name="Email")
-    code = models.CharField(max_length=6, verbose_name="OTP Code")
+    otp = models.CharField(max_length=6, verbose_name="OTP Code")
+    expires_at = models.DateTimeField(verbose_name="Expires at")
+    is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

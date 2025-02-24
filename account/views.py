@@ -7,7 +7,7 @@ from .models import User
 from utils import send_otp_code
 from .serializers import UserRegisterSerializer ,UserVerifyOTPSerializer,UserLoginSerializer
 import random
-from .email import send_otp_email
+from .email import send_otp_email,generate_otp
 from django.contrib.auth import login
 # Create your views here.
 
@@ -52,6 +52,15 @@ class VerifyOTPView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ResendOTPView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            user.generate_otp()
+            send_otp_email(user.email, user.otp)
+            return Response({'message': 'New OTP sent'}, status=status.HTTP_200_OK)
+        return Response({'error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLoginView(APIView):

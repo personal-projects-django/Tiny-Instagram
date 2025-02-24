@@ -21,11 +21,25 @@
     let password = document.getElementById('password').value;
     let password2 = document.getElementById('password2').value;
 
+    if (!username || !email || !password || !password2) {
+                alert("لطفاً همه فیلدها را پر کنید!");
+                return;
+    }
+
+            // بررسی اینکه رمزها یکسان باشند
+    if (password !== password2) {
+        alert("رمز عبور و تکرار آن باید یکسان باشند!");
+        return;
+    }
+
+
+
     let response = await fetch('http://127.0.0.1:8000/register/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password ,password2})
     })
+
 
     {#let result = await response.json();#}
     {#alert(result.message || result.error);#}
