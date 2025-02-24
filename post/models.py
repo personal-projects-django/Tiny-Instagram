@@ -33,23 +33,26 @@ class Post(models.Model):
 #  Comment
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.PROTECT,related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='replies')
+    is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     # likes = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'{self.text}, {self.sender}, {self.created_at}'
+        return f'{self.text}, {self.user}, {self.created_at}'
 
 
 #   Like
 
 class Like(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.PROTECT,related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_liked = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.user}, {self.post}, {self.created_at}'
