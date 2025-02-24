@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'account.apps.AccountConfig',
     'post.apps.PostConfig',
+    'follow.apps.FollowConfig',
     'notification.apps.NotificationConfig',
     'story.apps.StoryConfig',
     # 'phonenumber_field',
