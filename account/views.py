@@ -3,9 +3,11 @@ from django.views import View
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import User
+
+from permissions import IsOwnerOrReadOnly
+from .models import User, Profile
 from utils import send_otp_code
-from .serializers import UserRegisterSerializer ,UserVerifyOTPSerializer,UserLoginSerializer
+from .serializers import UserRegisterSerializer, UserVerifyOTPSerializer, UserLoginSerializer, ProfileSerializer
 import random
 from .email import send_otp_email,generate_otp
 from django.contrib.auth import login
@@ -64,6 +66,7 @@ class ResendOTPView(APIView):
 
 
 class UserLoginView(APIView):
+
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -154,3 +157,16 @@ class UserLoginView(APIView):
 #             user.save()
 #             return Response({'message': 'ورود موفقیت‌آمیز!', 'username': user.username}, status=status.HTTP_200_OK)
 #         return Response({'error': 'کد OTP اشتباه است!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileView(APIView):
+    permission_classes = [IsOwnerOrReadOnly, ]
+
+    def get(self, request,profile_pk):
+        try:
+            profile = Profile.objects.get(pk=profile_pk, user=request.user)
+            self.check_object_permissions(request, profile)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)

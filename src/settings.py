@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework.authtoken'
+    # 'rest_framework_simplejwt',
     'account.apps.AccountConfig',
     'post.apps.PostConfig',
     'follow.apps.FollowConfig',
@@ -167,7 +168,8 @@ AUTH_USER_MODEL = 'account.User'
 REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     )
 
 }

@@ -9,8 +9,6 @@ urlpatterns = [
     path('accept/', views.AcceptView.as_view()),
     path('friends/', views.FriendListView.as_view())
 
-
-
 ]
 
 

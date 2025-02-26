@@ -2,18 +2,23 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from permissions import IsOwnerOrReadOnly
 from .models import User, Post
-from .serializers import PostSerializer
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
+
+
 # Create your views here.
 
 
 class PostView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsOwnerOrReadOnly,)
 
 
     def get(self, request, post_pk):
         try:
             post = Post.objects.get(pk=post_pk, user=request.user)
+            self.check_object_permissions(request, post)
         except Post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = PostSerializer(post)
@@ -26,8 +31,31 @@ class PostView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class PostUpdateView(APIView):
+    permission_classes = (IsOwnerOrReadOnly,)
+
+    def put(self, request, post_pk):
+        post = Post.objects.get(pk=post_pk, user=request.user)
+        self.check_object_permissions(request, post)
+        serializer = PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostDeleteView(APIView):
+    permission_classes = (IsOwnerOrReadOnly,)
+    def delete(self, request, post_pk):
+        post = Post.objects.get(pk=post_pk, user=request.user)
+        self.check_object_permissions(request, post)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 class PostListView(APIView):
+    permission_classes = [ IsOwnerOrReadOnly,]
+
     def get(self, request):
         posts = Post.objects.filter(is_active=True)
         serializer = PostSerializer(posts, many=True)
@@ -41,7 +69,7 @@ class PostListView(APIView):
 #   Comment
 
 class CommentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [ IsOwnerOrReadOnly,]
 
     def get_post(self, post_pk):
         try:
@@ -76,7 +104,7 @@ class CommentView(APIView):
 
 
 class LikeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOwnerOrReadOnly, ]
 
     def get_post(self, post_pk):
         try:

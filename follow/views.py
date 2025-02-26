@@ -6,13 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from account.models import User
+from permissions import IsOwnerOrReadOnly
 from .models import Friendship
 from .serializers import UserListSerializer
 
 
 
 class UserListView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsOwnerOrReadOnly, ]
 
     def get(self, request):
         # users = User.objects.filter(is_superuser=False, is_staff=False, is_active=True)
@@ -26,7 +27,7 @@ class UserListView(APIView):
 
 
 class RequestView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsOwnerOrReadOnly, ]
 
     def post(self, request):
         user_id = request.data.get('user')
@@ -42,7 +43,7 @@ class RequestView(APIView):
 
 
 class RequestListView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsOwnerOrReadOnly, ]
 
     def get(self, request):
         friendship = Friendship.objects.filter(request_to=request.user, is_accepted=False)
@@ -52,7 +53,7 @@ class RequestListView(APIView):
 
 
 class AcceptView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsOwnerOrReadOnly, ]
 
     def post(self, request):
         user_id = request.data.get('user')
@@ -70,7 +71,7 @@ class AcceptView(APIView):
 
 
 class FriendListView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsOwnerOrReadOnly,]
 
     def get(self, request):
         friendship = Friendship.objects.filter(

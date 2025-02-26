@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from account.models import User
+from account.models import User, Profile
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -13,3 +13,5 @@ class UserListSerializer(serializers.ModelSerializer):
         if hasattr(instance, 'profile') and instance.profile.avatar:
             return instance.profile.avatar.url
         return ''
+
+

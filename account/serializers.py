@@ -1,8 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from account.models import User
-
+from account.models import User, Profile
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -69,3 +68,10 @@ class UserLoginSerializer(serializers.Serializer):
             if authenticated_user:
                 return authenticated_user
             raise serializers.ValidationError('Invalid credentials')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    # avatar = serializers.SerializerMethodField()
+    class Meta:
+        model = Profile
+        fields = ('user', 'avatar', 'bio', 'first_name', 'last_name', 'age')
