@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from permissions import IsOwnerOrReadOnly
 from .models import User, Profile
 from utils import send_otp_code
-from .serializers import UserRegisterSerializer, UserVerifyOTPSerializer, UserLoginSerializer, ProfileSerializer
+from .serializers import UserRegisterSerializer, UserVerifyOTPSerializer, UserLoginSerializer, ProfileSerializer, \
+    UserUpdateSerializer
 import random
 from .email import send_otp_email,generate_otp
 from django.contrib.auth import login
@@ -158,7 +159,21 @@ class UserLoginView(APIView):
 #             return Response({'message': 'ورود موفقیت‌آمیز!', 'username': user.username}, status=status.HTTP_200_OK)
 #         return Response({'error': 'کد OTP اشتباه است!'}, status=status.HTTP_400_BAD_REQUEST)
 
+class UserUpdateView(APIView):
+    permission_classes = (IsOwnerOrReadOnly,)
+    def put(self, request,user_pk):
+        user = User.objects.get(pk=user_pk,user=request.user)
+        self.check_object_permissions(request, user)
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+#    <<<<<<<<<<<<<<<<<<<   Profile  >>>>>>>>>>>>>>>>>>>>>>
 class ProfileView(APIView):
     permission_classes = [IsOwnerOrReadOnly, ]
 
@@ -170,3 +185,33 @@ class ProfileView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
+
+
+    def post(self, request):
+        serializer = ProfileSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileUpdateView(APIView):
+    permission_classes = [IsOwnerOrReadOnly, ]
+
+    def put(self, request, profile_pk):
+        profile = Profile.objects.get(pk=profile_pk, user=request.user)
+        self.check_object_permissions(request, profile)
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileDeleteView(APIView):
+    permission_classes = [IsOwnerOrReadOnly, ]
+    def delete(self, request, profile_pk):
+        profile = Profile.objects.get(pk=profile_pk, user=request.user)
+        self.check_object_permissions(request, profile)
+        profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

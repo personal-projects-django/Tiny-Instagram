@@ -70,6 +70,13 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Invalid credentials')
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username','phone']
+
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     # avatar = serializers.SerializerMethodField()
     class Meta:

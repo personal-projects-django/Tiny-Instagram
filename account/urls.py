@@ -11,10 +11,20 @@ from rest_framework.authtoken import views as auth_token
 urlpatterns = [
     # path('', TemplateView.as_view(template_name='home/base.html'), name='base'),
     # path('add', TemplateView.as_view(template_name='home/register.html'), name='add'),
+
+    # register
     path('register/', views.UserRegisterView.as_view(), name='register'),
     path('verify_otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
     path('resend_otp/', views.ResendOTPView.as_view(), name='resend_otp'),
     path('login/', views.UserLoginView.as_view(), name='login'),
+    path('user_update/<int:user_pk/>', views.UserUpdateView.as_view(), name='user_update'),
+
+
+    # profile
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('profile/<int:profile_pk>/', views.ProfileView.as_view(), name='profile_get'),
+    path('profile_update/<int:profile_pk>/', views.ProfileUpdateView.as_view(), name='profile_update'),
+    path('profile_delete/<int:profile_pk>/', views.ProfileDeleteView.as_view(), name='profile_delete'),
 
 
     # auth_token
@@ -23,12 +33,6 @@ urlpatterns = [
     # TOKEN JWT
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-
-
-
-
-
 
 
     # path('profile/<int:user_id>/password-change/',
