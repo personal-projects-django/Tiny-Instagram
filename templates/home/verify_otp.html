@@ -11,7 +11,7 @@
         <input type="text" id="otp" placeholder="کد ۶ رقمی"><br>
         <input type="submit" value="submit" id="تایید">
 
-{#        <button onclick="verifyOTP()">Verify</button>#}
+        <button onclick="verifyOTP()">Verify</button>
     </form>
 </body>
 
@@ -40,6 +40,8 @@
     </script>
 
 </html>
+
+
 {#.then(response => response.json())#}
 {#            .then(data => {#}
 {#                if (data.message) {#}
@@ -49,8 +51,7 @@
 {#                    alert('Invalid OTP');#}
 {#                }#}
 {#            });#}
-
-
+{#===================================================#}
 {#<!DOCTYPE html>#}
 {#<html>#}
 {#<head>#}
@@ -93,5 +94,40 @@
 {#    <input type="text" id="otp" placeholder="Enter OTP">#}
 {#    <button onclick="verifyOTP()">Verify</button>#}
 {#    <button onclick="resendOTP()">Resend OTP</button>#}
+{#</body>#}
+{#</html>#}
+
+
+{#================================#}
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>تأیید حساب</title>#}
+{#    <link rel="stylesheet" href="style.css">#}
+{#</head>#}
+{#<body>#}
+{#    <div class="container">#}
+{#        <h2>تأیید حساب</h2>#}
+{#        <form id="verify-otp-form">#}
+{#            <label for="email">ایمیل:</label>#}
+{#            <input type="email" id="email" name="email" required>#}
+{##}
+{#            <label for="otp">کد تایید:</label>#}
+{#            <input type="text" id="otp" name="otp" maxlength="6" required>#}
+{##}
+{#            <button type="submit">تأیید</button>#}
+{#        </form>#}
+{##}
+{#        <!-- دکمه ارسال مجدد OTP -->#}
+{#        <button id="resend-otp" style="display: none;">درخواست کد جدید</button>#}
+{##}
+{#        <div id="message"></div>#}
+{#    </div>#}
+{##}
+{#    <script src="script.js"></script>#}
 {#</body>#}
 {#</html>#}

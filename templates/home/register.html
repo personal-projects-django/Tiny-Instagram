@@ -1,58 +1,58 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-    <title>ثبت‌نام</title>
-</head>
-<body>
-    <h1>ثبت‌نام</h1>
-    <form id="registerForm">
-        <input type="text" id="username" name="username" placeholder="نام کاربری"><br>
-        <input type="email" id="email" name="email" placeholder="ایمیل"><br>
-        <input type="password" id="password" name="password" placeholder="رمز عبور"><br>
-        <input type="password" id="password2" name="password2" placeholder="تکرار رمز عبور"><br>
-        <input type="submit" value="submit" id="ادامه">
-    </form>
-</body>
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    let username = document.getElementById('username').value;
-    let email = document.getElementById('email').value;
-    let password = document.getElementById('password').value;
-    let password2 = document.getElementById('password2').value;
-
-    if (!username || !email || !password || !password2) {
-                alert("لطفاً همه فیلدها را پر کنید!");
-                return;
-    }
-
-            // بررسی اینکه رمزها یکسان باشند
-    if (password !== password2) {
-        alert("رمز عبور و تکرار آن باید یکسان باشند!");
-        return;
-    }
-
-
-
-    let response = await fetch('http://127.0.0.1:8000/register/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password ,password2})
-    })
-
-
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#    <title>ثبت‌نام</title>#}
+{#</head>#}
+{#<body>#}
+{#    <h1>ثبت‌نام</h1>#}
+{#    <form id="registerForm">#}
+{#        <input type="text" id="username" name="username" placeholder="نام کاربری"><br>#}
+{#        <input type="email" id="email" name="email" placeholder="ایمیل"><br>#}
+{#        <input type="password" id="password" name="password" placeholder="رمز عبور"><br>#}
+{#        <input type="password" id="password2" name="password2" placeholder="تکرار رمز عبور"><br>#}
+{#        <input type="submit" value="submit" id="ادامه">#}
+{#    </form>#}
+{#</body>#}
+{#    <script>#}
+{#        document.getElementById('registerForm').addEventListener('submit', async function(e) {#}
+{#    e.preventDefault();#}
+{#    let username = document.getElementById('username').value;#}
+{#    let email = document.getElementById('email').value;#}
+{#    let password = document.getElementById('password').value;#}
+{#    let password2 = document.getElementById('password2').value;#}
+{##}
+{#    if (!username || !email || !password || !password2) {#}
+{#                alert("لطفاً همه فیلدها را پر کنید!");#}
+{#                return;#}
+{#    }#}
+{##}
+{#            // بررسی اینکه رمزها یکسان باشند#}
+{#    if (password !== password2) {#}
+{#        alert("رمز عبور و تکرار آن باید یکسان باشند!");#}
+{#        return;#}
+{#    }#}
+{##}
+{##}
+{##}
+{#    let response = await fetch('http://127.0.0.1:8000/register/', {#}
+{#        method: 'POST',#}
+{#        headers: { 'Content-Type': 'application/json' },#}
+{#        body: JSON.stringify({ username, email, password ,password2})#}
+{#    })#}
+{##}
+{##}
     {#let result = await response.json();#}
     {#alert(result.message || result.error);#}
+{##}
+{##}
+{#    .then(response => response.json())#}
+{#    .then(data => window.location.replace('http://127.0.0.1:8000/otp/'))#}
+{#            .catch(error =>{#}
+{#                console.log(error)#}
+{#            })#}
+{##}
 
-
-    .then(response => response.json())
-    .then(data => window.location.replace('http://127.0.0.1:8000/otp/'))
-            .catch(error =>{
-                console.log(error)
-            })
-
-});
-
+{##}
             {#e.preventDefault();#}
             {#fetch("http://127.0.0.1:8000/register/", {#}
             {##}
@@ -63,7 +63,7 @@
             {#        password1: document.getElementById("password1").value,#}
             {#        password2: document.getElementById("password2").value#}
             {#    })#}
-
+{##}
             {#.then(response => response.json())#}
             {#.then(data => {#}
                 {#if (data.message) {#}
@@ -73,6 +73,44 @@
         {#            alert("خطا: " + JSON.stringify(data));#}
         {#        }#}
         {#    });#}
+{##}
+{#    </script>#}
+{#</html>#}
 
-    </script>
-</html>
+{#===================================================================#}
+{##}
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>ثبت‌نام</title>#}
+{#    <link rel="stylesheet" href="style.css">#}
+{#</head>#}
+{#<body>#}
+{#    <div class="container">#}
+{#        <h2>فرم ثبت‌نام</h2>#}
+{#        <form id="register-form">#}
+{#            <label for="username">نام کاربری:</label>#}
+{#            <input type="text" id="username" name="username" placeholder="نام کاربری" required >#}
+{##}
+{#            <label for="email">ایمیل:</label>#}
+{#            <input type="email" id="email" name="email" placeholder=" email" required>#}
+{##}
+{#            <label for="phone">شماره تماس:</label>#}
+{#            <input type="text" id="phone" name="phone"  placeholder=" phone" required>#}
+{##}
+{#            <label for="password">رمز عبور:</label>#}
+{#            <input type="password" id="password" name="password" placeholder=" password" required>#}
+{##}
+{#            <label for="password2">تایید رمز عبور:</label>#}
+{#            <input type="password" id="password2" name="password2" placeholder=" password2" required>#}
+{##}
+{#            <button type="submit">ثبت‌نام</button>#}
+{#        </form>#}
+{#        <div id="message"></div>#}
+{#    </div>#}
+{##}
+{#    <script src="script.js"></script>#}
+{#</body>#}
+{#</html>#}

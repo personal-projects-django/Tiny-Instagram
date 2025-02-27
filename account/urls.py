@@ -17,7 +17,7 @@ urlpatterns = [
     path('verify_otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
     path('resend_otp/', views.ResendOTPView.as_view(), name='resend_otp'),
     path('login/', views.UserLoginView.as_view(), name='login'),
-    path('user_update/<int:user_pk/>', views.UserUpdateView.as_view(), name='user_update'),
+    path('update/<int:user_pk>/', views.UserUpdateView.as_view(), name='user_update'),
 
 
     # profile
