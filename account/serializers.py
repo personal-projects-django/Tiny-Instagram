@@ -3,6 +3,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 
 from account.email import send_otp_email
 from account.models import User, Profile,OTP
@@ -21,16 +22,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
-
-
-        otp_instance = OTP.objects.create(
-            email=user.email,
-            otp=str(random.randint(100000, 999999)),
-            expires_at=timezone.now() + timedelta(minutes=1)
-        )
-
-        send_otp_email(user.email, otp_instance.otp)
-
+        # otp_instance = OTP.objects.create(
+        #     email=user.email,
+        #     otp=str(random.randint(100000, 999999)),
+        #     expires_at=timezone.now() + timedelta(minutes=1)
+        # )
+        #
+        # send_otp_email(user.email, otp_instance.otp)
         return user
 
     def validate_username(self, value):
@@ -39,6 +37,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+
         if data['password'] != data['password2']:
             raise serializers.ValidationError('Passwords must match.')
         return data
@@ -114,9 +113,15 @@ class ResendOTPSerializer(serializers.Serializer):
 
 
 
-class UserLoginSerializer(serializers.Serializer):
+class UserLoginSerializer(serializers.ModelSerializer):
     username_or_email = serializers.CharField()
     password = serializers.CharField(write_only=True)
+    access_token = serializers.CharField(max_length=255,read_only=True)
+    refresh_token = serializers.CharField(max_length=255,read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username_or_email','password','access_token','refresh_token']
 
     def validate(self, data):
         username_or_email = data.get('username_or_email')
@@ -125,11 +130,22 @@ class UserLoginSerializer(serializers.Serializer):
         user = (User.objects.filter(username=username_or_email).first() or
                 User.objects.filter(email=username_or_email).first())
 
-        if user and OTP.is_verified:
+        if user and User.is_verified:
             authenticated_user = authenticate(username=username_or_email, password=password)
-            if authenticated_user:
-                return authenticated_user
-            raise serializers.ValidationError('Invalid credentials')
+            if not authenticated_user:
+                raise AuthenticationFailed('Invalid credentials try again.')
+            user_tokens = user.tokens()
+
+
+            return {
+                'username_or_email': user.username,
+                'access_token': str(user_tokens.get('access')),
+                'refresh_token': str(user_tokens.get('refresh')),
+
+            }
+
+
+
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

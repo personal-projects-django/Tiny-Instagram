@@ -43,14 +43,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
+
+
     # 'rest_framework.authtoken'
-    # 'rest_framework_simplejwt',
+    # 'phonenumber_field',
+
+
+
+    # App in Project
     'account.apps.AccountConfig',
     'post.apps.PostConfig',
     'follow.apps.FollowConfig',
     'notification.apps.NotificationConfig',
     'story.apps.StoryConfig',
-    # 'phonenumber_field',
+
 
 
 
@@ -168,8 +175,8 @@ AUTH_USER_MODEL = 'account.User'
 REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
     )
 
 }
@@ -186,9 +193,9 @@ SIMPLE_JWT = {
 #  email account
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'mohammadrezajavaherykian@gmail.com'
-EMAIL_HOST_PASSWORD = 'bxkvbwajhlqhamez'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'TinyInstagram <<EMAIL>>'
+DEFAULT_FROM_EMAIL = 'TinyInstagram'

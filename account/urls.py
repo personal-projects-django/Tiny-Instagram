@@ -5,6 +5,7 @@ from . import views
 from django.contrib.auth.views import  PasswordChangeView, PasswordChangeDoneView
 from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
+
 from rest_framework.authtoken import views as auth_token
 
 
@@ -15,7 +16,7 @@ urlpatterns = [
     # register
     path('register/', views.UserRegisterView.as_view(), name='register'),
     path('verify_otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
-    path('resend_otp/', views.ResendOTPView.as_view(), name='resend_otp'),
+    # path('resend_otp/', views.ResendOTPView.as_view(), name='resend_otp'),
     path('login/', views.UserLoginView.as_view(), name='login'),
     path('update/<int:user_pk>/', views.UserUpdateView.as_view(), name='user_update'),
 
@@ -28,7 +29,7 @@ urlpatterns = [
 
 
     # auth_token
-    path('api-token-auth/', auth_token.obtain_auth_token),
+    # path('api-token-auth/', auth_token.obtain_auth_token),
 
     # TOKEN JWT
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

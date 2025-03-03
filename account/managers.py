@@ -1,7 +1,14 @@
 from django.contrib.auth.models import BaseUserManager
+from django.core.validators import validate_email
+from rest_framework.exceptions import ValidationError
 
 
 class UserManager(BaseUserManager):
+    def email_validator(self, email):
+        try:
+            validate_email(email)
+        except ValidationError:
+            raise ValidationError('Invalid email address.')
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
@@ -24,4 +31,5 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
         if extra_fields.get('is_active') is not True:
             raise ValueError('Superuser must have is_active=True.')
+        user.save(using=self._db)
         return user

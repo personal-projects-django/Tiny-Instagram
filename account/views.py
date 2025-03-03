@@ -1,6 +1,9 @@
+from typing import Generic
+
 from django.shortcuts import render
 from django.views import View
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -64,8 +67,8 @@ from datetime import timedelta
 #             except User.DoesNotExist:
 #                 return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#
+
+
 # class ResendOTPView(APIView):
 #     def post(self, request):
 #         email = request.data.get('email')
@@ -82,112 +85,89 @@ from datetime import timedelta
 
 #  <<<<<<<<<<<<<<<<<<< second code register test  >>>>>>>>>>>>>>>>>>>>>>>>
 
-class UserRegisterView(APIView):
+class UserRegisterView(GenericAPIView):
+    serializer_class = UserRegisterSerializer
+
     def post(self, request):
-        serializer = UserRegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-
-
-            existing_otp = OTP.objects.filter(email=user.email, expires_at__gt=timezone.now()).first()
-            if existing_otp:
-                return Response({
-                    'message': 'An OTP is already sent. Please wait for it to expire.',
-                    'expires_at': existing_otp.expires_at
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-
-            otp_instance = OTP.objects.create(
-                email=user.email,
-                otp=str(random.randint(100000, 999999)),
-                expires_at=timezone.now() + timedelta(minutes=1)
-            )
-
-            send_otp_email(user.email, otp_instance.otp)
-
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            user = serializer.data
+            send_otp_email(user['email'])
+            print(user)
+            # send email
             return Response({
-                'message': 'OTP sent to email',
-                'expires_at': otp_instance.expires_at
+                'data':user,
+                'message':f'hi {user} thanks for signing up a passcode'
             }, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class VerifyOTPView(APIView):
+class VerifyOTPView(GenericAPIView):
     def post(self, request):
-        serializer = UserVerifyOTPSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-            otp = serializer.validated_data['otp']
+        otpcode = request.data.get('otp')
+        try:
+            user_code_obj = OTP.objects.get(otp=otpcode)
+            user = user_code_obj.user
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+                return Response({
+                    'message':'account email verified successfully'
+                }, status=status.HTTP_200_OK)
+            return Response({
+                'message': 'code is invalid user already verified'
+            }, status=status.HTTP_204_NO_CONTENT)
 
-            otp_instance = OTP.objects.filter(email=email).first()
-            if not otp_instance:
-                return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-            if timezone.now() > otp_instance.expires_at:
-                otp_instance.delete()
-                return Response({'error': 'OTP expired. Please request a new one.'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-            if hasattr(otp_instance, 'attempts') and otp_instance.attempts >= 3:
-                otp_instance.delete()
-                return Response({'error': 'Too many failed attempts. Please request a new OTP.'},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-
-            if otp_instance.otp != otp:
-                otp_instance.attempts = getattr(otp_instance, 'attempts', 0) + 1
-                otp_instance.save()
-                return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+        except OTP.DoesNotExist:
+            return Response({
+                'message': 'passcode not provided'
+            }, status=status.HTTP_404_NOT_FOUND)
 
 
-            user = User.objects.get(email=email)
-            user.is_verified = True
-            user.save()
-            otp_instance.delete()
-
-            login(request, user)
-            return Response({'message': 'Account verified'}, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ResendOTPView(APIView):
+class UserLoginView(GenericAPIView):
+    serializer_class = UserLoginSerializer
     def post(self, request):
-        serializer = ResendOTPSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-
-            try:
-                otp_instance = OTP.objects.get(email=email)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
-                otp_instance.otp = str(random.randint(100000, 999999))
-                otp_instance.expires_at = timezone.now() + timedelta(minutes=1)
-                otp_instance.save()
 
-
-                send_otp_email(email, otp_instance.otp)
-
-                return Response({'message': 'OTP has been sent to your email.'}, status=status.HTTP_200_OK)
-
-            except OTP.DoesNotExist:
-                return Response({'error': 'Email not registered.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+# class ResendOTPView(APIView):
+#     def post(self, request):
+#         serializer = ResendOTPSerializer(data=request.data)
+#         if serializer.is_valid():
+#             email = serializer.validated_data['email']
+#
+#             try:
+#                 otp_instance = OTP.objects.get(email=email)
+#
+#
+#                 otp_instance.otp = str(random.randint(100000, 999999))
+#                 otp_instance.expires_at = timezone.now() + timedelta(minutes=1)
+#                 otp_instance.save()
+#
+#
+#                 send_otp_email(email, otp_instance.otp)
+#
+#                 return Response({'message': 'OTP has been sent to your email.'}, status=status.HTTP_200_OK)
+#
+#             except OTP.DoesNotExist:
+#                 return Response({'error': 'Email not registered.'}, status=status.HTTP_400_BAD_REQUEST)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
 
 
 #  <<<<<<<<<<<  login  >>>>>>>>>>>>>>>>>>>>>
-class UserLoginView(APIView):
-
-    def post(self, request):
-        serializer = UserLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data
-            login(request, user)
-            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class UserLoginView(APIView):
+#
+#     def post(self, request):
+#         serializer = UserLoginSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.validated_data
+#             login(request, user)
+#             return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #  <<<<<<<<<<<<<< end login >>>>>>>>>>>>>>>>>>>>>>>>>>>
 

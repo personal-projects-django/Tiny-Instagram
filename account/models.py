@@ -2,6 +2,8 @@ from django.db import models
 
 # Create your models here.
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .managers import UserManager
 from django.core.validators import RegexValidator
 import random
@@ -17,7 +19,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_regex = RegexValidator(regex=r'^(0|0098|\+98)?9(0[1-5]|[1-3]\d|2[0-2]|9[0-9])\d{7}$',
                                  message='The entered phone number format is incorrect.')
     phone = models.CharField(validators=[phone_regex], max_length=11, blank=True, verbose_name="Phone number")
-
+    is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -29,6 +31,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.email}, ( {self.username} )'
+
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
     # def generate_otp(self):
     #     self.otp = str(random.randint(100000, 999999))
@@ -43,10 +53,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 #   OTP
 
 class OTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField(unique=True, verbose_name="Email")
     otp = models.CharField(max_length=6, verbose_name="OTP Code")
-    expires_at = models.DateTimeField(verbose_name="Expires at")
-    is_verified = models.BooleanField(default=False)
+    # expires_at = models.DateTimeField(verbose_name="Expires at")
+    # is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -74,6 +85,8 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     # post = models.ManyToManyField(Post, blank=True)
 
+
+    @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
