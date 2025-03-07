@@ -7,8 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .managers import UserManager
 from django.core.validators import RegexValidator
 import random
-from django.utils import timezone
-from datetime import timedelta
+from django.utils.timezone import now, timedelta
 
 
 #    User
@@ -51,25 +50,32 @@ class User(AbstractBaseUser, PermissionsMixin):
     #     return False
 
 #   OTP
+def get_expiration_time():
+    return now() + timedelta(minutes=1)
 
 class OTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField(unique=True, verbose_name="Email")
     otp = models.CharField(max_length=6, verbose_name="OTP Code")
-    # expires_at = models.DateTimeField(verbose_name="Expires at")
+    expires_at = models.DateTimeField(verbose_name="Expires at", default=get_expiration_time)
     # is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.email}, ( {self.otp} ),{self.created_at}'
+        return f'{self.email}, ( {self.otp} ),{self.created_at},Expires: {self.expires_at}'
 
-    def generate_otp(self):
-        self.otp = str(random.randint(100000, 999999))
-        self.expires_at = timezone.now() + timedelta(minutes=1)
-        self.save()
+    def is_expired(self):
+        return now() > self.expires_at
 
-    def is_otp_valid(self):
-        return timezone.now() <= self.expires_at
+
+    # def generate_otp(self):
+    #     self.otp = str(random.randint(100000, 999999))
+    #     self.expires_at = timezone.now() + timedelta(minutes=1)
+    #     self.save()
+    #
+    # def is_otp_valid(self):
+    #     return timezone.now() <= self.expires_at
+
 
 
 #      Profile

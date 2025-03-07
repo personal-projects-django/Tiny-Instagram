@@ -20,6 +20,13 @@ urlpatterns = [
     path('login/', views.UserLoginView.as_view(), name='login'),
     path('update/<int:user_pk>/', views.UserUpdateView.as_view(), name='user_update'),
 
+    # password
+    path('password_reset/', views.PasswordResetRequestView.as_view(), name='password_reset'),
+    path('password_reset_confirm/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name='password_reset_confirm'),
+    path('set_new_password/', views.SetNewPasswordView.as_view(), name='set_new_password'),
+
+    # logout
+    path('logout/', views.LogoutUserView.as_view(), name='logout'),
 
     # profile
     path('profile/', views.ProfileView.as_view(), name='profile'),
@@ -34,12 +41,5 @@ urlpatterns = [
     # TOKEN JWT
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-
-    # path('profile/<int:user_id>/password-change/',
-    #      PasswordChangeView.as_view(template_name='accounts/password/password_change.html'), name='password_change'),
-    # path('password-change-done/',
-    #      PasswordChangeDoneView.as_view(template_name='accounts/password/password_change_done.html'),
-    #      name='password_change_done'),
 
 ]

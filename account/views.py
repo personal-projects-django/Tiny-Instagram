@@ -1,6 +1,9 @@
 from typing import Generic
 
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import render
+from django.utils.encoding import smart_str, DjangoUnicodeDecodeError
+from django.utils.http import urlsafe_base64_decode
 from django.views import View
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
@@ -10,14 +13,14 @@ from rest_framework.response import Response
 from permissions import IsOwnerOrReadOnly
 from .models import User, Profile ,OTP
 from utils import send_otp_code
-from .serializers import UserRegisterSerializer, UserVerifyOTPSerializer, UserLoginSerializer, ProfileSerializer, \
-    UserUpdateSerializer,ResendOTPSerializer
+from .serializers import UserRegisterSerializer,  UserLoginSerializer, ProfileSerializer, \
+    UserUpdateSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer,LogoutUserSerializer
 import random
 from .email import send_otp_email,generate_otp
 from django.contrib.auth import login
 
-from django.utils import timezone
-from datetime import timedelta
+from django.utils.timezone import now
+
 # Create your views here.
 
 # <<<<<<<<<<<< normal register  >>>>>>>>>>>>>>>>>>>>>
@@ -102,26 +105,57 @@ class UserRegisterView(GenericAPIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# class VerifyOTPView(GenericAPIView):
+#     def post(self, request):
+#         otpcode = request.data.get('otp')
+#         try:
+#             user_code_obj = OTP.objects.get(otp=otpcode)
+#             user = user_code_obj.user
+#             if not user.is_verified:
+#                 user.is_verified = True
+#                 user.save()
+#                 return Response({
+#                     'message':'account email verified successfully'
+#                 }, status=status.HTTP_200_OK)
+#             return Response({
+#                 'message': 'code is invalid user already verified'
+#             }, status=status.HTTP_204_NO_CONTENT)
+#
+#         except OTP.DoesNotExist:
+#             return Response({
+#                 'message': 'passcode not provided'
+#             }, status=status.HTTP_404_NOT_FOUND)
+
 class VerifyOTPView(GenericAPIView):
     def post(self, request):
-        otpcode = request.data.get('otp')
+        otp_code = request.data.get('otp')
+        email = request.data.get('email')
+
+        if not otp_code or not email:
+            return Response({'message': 'Email and OTP are required'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            user_code_obj = OTP.objects.get(otp=otpcode)
-            user = user_code_obj.user
+            user_otp = OTP.objects.get(user__email=email, otp=otp_code)
+
+            if user_otp.is_expired():
+                new_otp_response = send_otp_email(email)
+                return Response({
+                    'message': 'OTP has expired, a new OTP has been sent',
+                    'expires_in': new_otp_response.get('expires_in', '1 minutes ')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            user = user_otp.user
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
-                return Response({
-                    'message':'account email verified successfully'
-                }, status=status.HTTP_200_OK)
-            return Response({
-                'message': 'code is invalid user already verified'
-            }, status=status.HTTP_204_NO_CONTENT)
+                user_otp.delete()
+
+                return Response({'message': 'Account email verified successfully'}, status=status.HTTP_200_OK)
+
+            return Response({'message': 'User already verified'}, status=status.HTTP_200_OK)
 
         except OTP.DoesNotExist:
-            return Response({
-                'message': 'passcode not provided'
-            }, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'Invalid OTP or email'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class UserLoginView(GenericAPIView):
@@ -131,6 +165,46 @@ class UserLoginView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+#             Password
+
+class PasswordResetRequestView(GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        return Response({'message':'a link has been sent to your email to reset your password'}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirm(GenericAPIView):
+    def get(self, request,uidb64, token):
+        try:
+            user_id = smart_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=user_id)
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                return Response({'message':'token is invalid or has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'success': True,'message':'credentials is valid','uidb64':uidb64,'token':token}, status=status.HTTP_200_OK)
+
+        except DjangoUnicodeDecodeError:
+            return Response({'message':'token is invalid or has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class SetNewPasswordView(GenericAPIView):
+    serializer_class = SetNewPasswordSerializer
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({'message':'password reset successfull'},status=status.HTTP_200_OK)
+
+
+#      logout
+
+class LogoutUserView(GenericAPIView):
+    serializer_class = LogoutUserSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # class ResendOTPView(APIView):

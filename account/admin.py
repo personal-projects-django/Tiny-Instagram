@@ -38,6 +38,6 @@ admin.site.register(User,UserAdmin)
 
 class OTPAdmin(admin.ModelAdmin):
     model = OTP
-    list_display = ['user','otp','email']
+    list_display = ['user','otp','email','expires_at']
 
 admin.site.register(OTP,OTPAdmin)
