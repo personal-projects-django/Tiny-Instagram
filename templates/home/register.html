@@ -1,3 +1,132 @@
+<!-- register.html -->
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ثبت‌نام</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
+    <h2 class="text-2xl font-bold mb-6 text-center">ثبت‌نام</h2>
+    <form id="register-form">
+      <div class="mb-4">
+        <label for="username" class="block text-sm font-medium text-gray-700">نام کاربری</label>
+        <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+      </div>
+      <div class="mb-4">
+        <label for="email" class="block text-sm font-medium text-gray-700">ایمیل</label>
+        <input type="email" id="email" name="email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+      </div>
+      <div class="mb-4">
+        <label for="phone" class="block text-sm font-medium text-gray-700">شماره موبایل</label>
+        <input type="text" id="phone" name="phone" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+      </div>
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium text-gray-700">گذرواژه</label>
+        <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+      </div>
+      <div class="mb-4">
+        <label for="password2" class="block text-sm font-medium text-gray-700">تایید گذرواژه</label>
+        <input type="password" id="password2" name="password2" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+      </div>
+      <div class="flex justify-center">
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">ثبت‌نام</button>
+      </div>
+    </form>
+      <!-- لینک ورود -->
+    <p class="text-center mt-4">
+      قبلاً ثبت‌نام کرده‌اید؟ <a href="http://127.0.0.1:8000/log/" class="text-blue-500 hover:underline">ورود</a>
+    </p>
+    <div id="error-message" class="text-red-500 mt-4 text-center hidden"></div>
+  </div>
+
+  <script>
+    // تابع ترجمه خطا به فارسی (در صورت نیاز)
+    function translateError(message) {
+      const translations = {
+        "user with this Username already exists.": "کاربری با این نام کاربری وجود دارد.",
+        "user with this Email already exists.": "کاربری با این ایمیل وجود دارد.",
+        "Passwords must match.": "گذرواژه‌ها باید با هم مطابقت داشته باشند."
+        // می‌توانید پیام‌های بیشتری اضافه کنید...
+      };
+      return translations[message] || message;
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async function(event) {
+      event.preventDefault(); // جلوگیری از ارسال پیش‌فرض فرم
+
+      // جمع‌آوری داده‌های فرم
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const password2 = document.getElementById('password2').value;
+
+      // آماده‌سازی داده‌ها
+      const formData = { username, email, phone, password, password2 };
+      console.log("فرم داده‌ها:", formData);
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/register/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        console.log("پاسخ سرور:", result);
+
+        if (response.ok) {
+          // هدایت به صفحه تایید OTP در صورت موفقیت
+          window.location.replace(`http://127.0.0.1:8000/otp?email=${email}`);
+        } else {
+          const errorMessageEl = document.getElementById('error-message');
+          let errorText = "";
+          if (result.username) {
+            errorText = "خطا در نام کاربری: " + result.username[0];
+          } else if (result.email) {
+            errorText = "خطا در ایمیل: " + result.email[0];
+          } else if (result.phone) {
+            errorText = "خطا در شماره موبایل: " + result.phone[0];
+          } else if (result.password) {
+            errorText = "خطا در گذرواژه: " + result.password[0];
+          } else if (result.password2) {
+            errorText = "خطا در تایید گذرواژه: " + result.password2[0];
+          } else if (result.non_field_errors) {
+            errorText = result.non_field_errors[0];
+          } else {
+            errorText = result.message || 'خطا در ثبت‌نام';
+          }
+          // ترجمه پیام خطا (در صورت وجود ترجمه)
+          errorMessageEl.textContent = translateError(errorText);
+          errorMessageEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error("خطای Fetch:", error);
+        const errorMessageEl = document.getElementById('error-message');
+        errorMessageEl.textContent = "خطا در ارتباط با سرور.";
+        errorMessageEl.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
 {#<!DOCTYPE html>#}
 {#<html lang="fa">#}
 {#<head>#}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تکمیل مشخصات پروفایل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+<!-- فرم تکمیل مشخصات اولیه پروفایل -->
+<div id="profileCompletionForm" class="max-w-md mx-auto mt-10 bg-white shadow-md rounded-lg p-6 hidden">
+    <h2 class="text-2xl font-semibold mb-4">تکمیل مشخصات پروفایل</h2>
+    <form id="profileForm">
+        <div class="mb-4">
+            <label for="avatarInput" class="block text-sm font-medium text-gray-700">عکس پروفایل</label>
+            <input type="file" id="avatarInput" class="w-full mt-2 p-2 border rounded-md">
+        </div>
+        <div class="mb-4">
+            <label for="firstName" class="block text-sm font-medium text-gray-700">نام</label>
+            <input type="text" id="firstName" class="w-full mt-2 p-2 border rounded-md" required>
+        </div>
+        <div class="mb-4">
+            <label for="lastName" class="block text-sm font-medium text-gray-700">نام خانوادگی</label>
+            <input type="text" id="lastName" class="w-full mt-2 p-2 border rounded-md" required>
+        </div>
+        <div class="mb-4">
+            <label for="bio" class="block text-sm font-medium text-gray-700">بیو</label>
+            <textarea id="bio" class="w-full mt-2 p-2 border rounded-md" required></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="age" class="block text-sm font-medium text-gray-700">سن</label>
+            <input type="number" id="age" class="w-full mt-2 p-2 border rounded-md" required>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full">ذخیره اطلاعات</button>
+    </form>
+</div>
+
+<!-- نمایش یوزرنیم کاربر -->
+<div id="usernameDisplay" class="max-w-md mx-auto mt-10 bg-white shadow-md rounded-lg p-6">
+    <h3 id="username" class="text-xl font-semibold">نام کاربری: </h3>
+</div>
+
+<!-- جاوا اسکریپت -->
+<script>
+// فرض می‌کنیم که توکن JWT از قبل دریافت شده باشد
+const token = localStorage.getItem('token'); // یا از هر روش دیگر برای ذخیره توکن استفاده کنید
+
+// توکن را به هدر درخواست اضافه کنید
+const headers = {
+    'Authorization': `Bearer ${token}`
+};
+
+// بررسی پروفایل کاربر
+function checkProfileCompletion() {
+  fetch('http://127.0.0.1:8000/profile/', {
+    method: 'GET',
+    headers: headers
+  })
+    .then(response => response.json())
+    .then(data => {
+      // نمایش نام کاربری
+      document.getElementById('username').textContent = `نام کاربری: ${data.username}`;
+
+      // اگر پروفایل ناقص است، فرم تکمیل مشخصات را نمایش دهیم
+      if (!data.first_name || !data.last_name || !data.bio || !data.age) {
+        document.getElementById('profileCompletionForm').classList.remove('hidden');
+      } else {
+        window.location.href = "/dashboard"; // اگر پروفایل کامل است، به داشبورد هدایت می‌شود
+      }
+    })
+    .catch(error => {
+      console.error('Error checking profile completion:', error);
+    });
+}
+
+// ارسال فرم تکمیل مشخصات پروفایل
+document.getElementById('profileForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append('avatar', document.getElementById('avatarInput').files[0]);
+  formData.append('first_name', document.getElementById('firstName').value);
+  formData.append('last_name', document.getElementById('lastName').value);
+  formData.append('bio', document.getElementById('bio').value);
+  formData.append('age', document.getElementById('age').value);
+
+  fetch('/api/profile/', {
+    method: 'POST',
+    headers: headers,
+    body: formData,
+  })
+    .then(response => response.json())
+    .then(data => {
+      alert('اطلاعات پروفایل با موفقیت ذخیره شد!');
+      window.location.href = "/dashboard"; // هدایت به داشبورد پس از ذخیره موفقیت‌آمیز
+    })
+    .catch(error => {
+      console.error('Error submitting profile data:', error);
+    });
+});
+
+// وقتی صفحه بارگذاری می‌شود، پروفایل را چک می‌کنیم
+checkProfileCompletion();
+</script>
+
+</body>
+</html>
