@@ -34,7 +34,15 @@ urlpatterns = [
     path('otp/', TemplateView.as_view(template_name='home/verify_otp.html'), name='otp'),
     path('log/', TemplateView.as_view(template_name='home/login.html'), name='log'),
     path('dash/', TemplateView.as_view(template_name='home/dashboard.html'), name='dashboard'),
-    path('pro/', TemplateView.as_view(template_name='home/profile.html'), name='profile'),
+    path('pro/', TemplateView.as_view(template_name='home/profile.html'), name='pro'),
+    path('mypro/', TemplateView.as_view(template_name='home/myprofile.html'), name='mypro'),
+    path('edpro/', TemplateView.as_view(template_name='home/edit_profile.html'), name='edipro'),
+    path('exp/', TemplateView.as_view(template_name='home/explore.html'), name='exp'),
+    path('prosec/', TemplateView.as_view(template_name='home/profilesection.html'), name='prosec'),
+    path('postha/', TemplateView.as_view(template_name='home/post.html'), name='postha'),
+    path('crepost/', TemplateView.as_view(template_name='home/createpost.html'), name='crepost'),
+    path('out/', TemplateView.as_view(template_name='home/logout.html'), name='out'),
+
 
 ]
 

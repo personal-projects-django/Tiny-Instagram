@@ -1,5 +1,5 @@
 from typing import Generic
-
+from rest_framework import generics, filters
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import render
 from django.utils.encoding import smart_str, DjangoUnicodeDecodeError
@@ -7,6 +7,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.views import View
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -14,7 +15,7 @@ from permissions import IsOwnerOrReadOnly
 from .models import User, Profile ,OTP
 from utils import send_otp_code
 from .serializers import UserRegisterSerializer,  UserLoginSerializer, ProfileSerializer, \
-    UserUpdateSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer,LogoutUserSerializer
+    UserUpdateSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer,LogoutUserSerializer,UserProfileSerializer
 import random
 from .email import send_otp_email,generate_otp
 from django.contrib.auth import login
@@ -22,7 +23,11 @@ from django.contrib.auth import login
 from django.utils.timezone import now
 
 # Create your views here.
-
+class UserSearchView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
 # <<<<<<<<<<<< normal register  >>>>>>>>>>>>>>>>>>>>>
 
 # class Home(View):
@@ -346,40 +351,96 @@ class UserUpdateView(APIView):
 
 #    <<<<<<<<<<<<<<<<<<<   Profile  >>>>>>>>>>>>>>>>>>>>>>
 #                    get post put delete
-class ProfileView(APIView):
-    permission_classes = [IsOwnerOrReadOnly, ]
 
-    def get(self, request,profile_pk):
-        try:
-            profile = Profile.objects.get(pk=profile_pk, user=request.user)
-            self.check_object_permissions(request, profile)
-        except Profile.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+# class GetProfileView(APIView)
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get(self, request, user_id=None):
+        if user_id:
+            try:
+                profile = Profile.objects.get(user__id=user_id)
+                self.check_object_permissions(request, profile)
+            except Profile.DoesNotExist:
+                return Response({"detail": "پروفایل پیدا نشد"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                profile = Profile.objects.get(user=request.user)
+                self.check_object_permissions(request, profile)
+            except Profile.DoesNotExist:
+                return Response({"detail": "پروفایل پیدا نشد"}, status=status.HTTP_404_NOT_FOUND)
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
 
+class PostProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        serializer = ProfileSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# <<<<<<<<<<<<<<<<  update >>>>>>>>>>>>>>>>>>>>>>>
-
-class ProfileUpdateView(APIView):
-    permission_classes = [IsOwnerOrReadOnly, ]
-
-    def put(self, request, profile_pk):
-        profile = Profile.objects.get(pk=profile_pk, user=request.user)
-        self.check_object_permissions(request, profile)
-        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        if Profile.objects.filter(user=request.user).exists():
+            return Response({"detail": "پروفایل شما از قبل ثبت شده است."}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ProfileSerializer(data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self, request):
+    #     serializer = ProfileSerializer(data=request.data)
+    #     if serializer.is_valid(raise_exception=True):
+    #         serializer.save(user=request.user)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# <<<<<<<<<<<<<<<<  update >>>>>>>>>>>>>>>>>>>>>>>
+class ProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def put(self, request, user_id=None):
+
+        if user_id:
+            try:
+                profile = Profile.objects.get(user__id=user_id)
+                self.check_object_permissions(request, profile)  # بررسی دسترسی
+            except Profile.DoesNotExist:
+                return Response({"detail": "پروفایل پیدا نشد"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                profile = Profile.objects.get(user=request.user)
+                self.check_object_permissions(request, profile)  # بررسی دسترسی
+            except Profile.DoesNotExist:
+                return Response({"detail": "پروفایل پیدا نشد"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ProfileSerializer(instance=profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class ProfileUpdateView(APIView):
+#     permission_classes = [IsAuthenticated,IsOwnerOrReadOnly, ]
+#
+#     def put(self, request, pk):
+#
+#         try:
+#             profile = Profile.objects.get(pk=pk, user=request.user)
+#             self.check_object_permissions(request, profile)
+#         except Profile.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#         serializer = ProfileSerializer(instance=profile, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save(user=request.user)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # profile = Profile.objects.get(pk=profile_pk, user=request.user)
+        # self.check_object_permissions(request, profile)
+        # serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        # if serializer.is_valid():
+        #     serializer.save(user=request.user)
+        #     return Response(serializer.data, status=status.HTTP_200_OK)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # <<<<<<<<<<<<<<<<  delete >>>>>>>>>>>>>>>>>>>>>>>

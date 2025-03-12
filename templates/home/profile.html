@@ -3,106 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تکمیل مشخصات پروفایل</title>
+    <title>تکمیل پروفایل</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/static/css/style.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<!-- فرم تکمیل مشخصات اولیه پروفایل -->
-<div id="profileCompletionForm" class="max-w-md mx-auto mt-10 bg-white shadow-md rounded-lg p-6 hidden">
-    <h2 class="text-2xl font-semibold mb-4">تکمیل مشخصات پروفایل</h2>
-    <form id="profileForm">
-        <div class="mb-4">
-            <label for="avatarInput" class="block text-sm font-medium text-gray-700">عکس پروفایل</label>
-            <input type="file" id="avatarInput" class="w-full mt-2 p-2 border rounded-md">
-        </div>
-        <div class="mb-4">
-            <label for="firstName" class="block text-sm font-medium text-gray-700">نام</label>
-            <input type="text" id="firstName" class="w-full mt-2 p-2 border rounded-md" required>
-        </div>
-        <div class="mb-4">
-            <label for="lastName" class="block text-sm font-medium text-gray-700">نام خانوادگی</label>
-            <input type="text" id="lastName" class="w-full mt-2 p-2 border rounded-md" required>
-        </div>
-        <div class="mb-4">
-            <label for="bio" class="block text-sm font-medium text-gray-700">بیو</label>
-            <textarea id="bio" class="w-full mt-2 p-2 border rounded-md" required></textarea>
-        </div>
-        <div class="mb-4">
-            <label for="age" class="block text-sm font-medium text-gray-700">سن</label>
-            <input type="number" id="age" class="w-full mt-2 p-2 border rounded-md" required>
-        </div>
-        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full">ذخیره اطلاعات</button>
-    </form>
-</div>
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
+        <h2 class="text-2xl font-bold mb-6 text-center">تکمیل اطلاعات</h2>
+        <form id="profile-form">
+            <div class="mb-4">
+                <label for="first_name" class="block text-sm font-medium text-gray-700">نام</label>
+                <input type="text" id="first_name" name="first_name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="last_name" class="block text-sm font-medium text-gray-700">نام خانوادگی</label>
+                <input type="text" id="last_name" name="last_name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="bio" class="block text-sm font-medium text-gray-700">بیو</label>
+                <textarea id="bio" name="bio" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="age" class="block text-sm font-medium text-gray-700">سن</label>
+                <input type="number" id="age" name="age" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md">
+            </div>
+            <div class="mb-4">
+                <label for="avatar" class="block text-sm font-medium text-gray-700">انتخاب عکس پروفایل</label>
+                <input type="file" id="avatar" name="avatar" accept="image/*" class="mt-1 block w-full">
+            </div>
+            <div class="flex justify-center">
+                <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">ذخیره</button>
+            </div>
+        </form>
+        <div id="error-message" class="text-red-500 mt-4 text-center hidden"></div>
+    </div>
 
-<!-- نمایش یوزرنیم کاربر -->
-<div id="usernameDisplay" class="max-w-md mx-auto mt-10 bg-white shadow-md rounded-lg p-6">
-    <h3 id="username" class="text-xl font-semibold">نام کاربری: </h3>
-</div>
+    <script>
+        document.getElementById("profile-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
 
-<!-- جاوا اسکریپت -->
-<script>
-// فرض می‌کنیم که توکن JWT از قبل دریافت شده باشد
-const token = localStorage.getItem('token'); // یا از هر روش دیگر برای ذخیره توکن استفاده کنید
+            const token = localStorage.getItem("access_token");
 
-// توکن را به هدر درخواست اضافه کنید
-const headers = {
-    'Authorization': `Bearer ${token}`
-};
+            if (!token) {
+                window.location.replace("http://127.0.0.1:8000/log/");
+                return;
+            }
 
-// بررسی پروفایل کاربر
-function checkProfileCompletion() {
-  fetch('http://127.0.0.1:8000/profile/', {
-    method: 'GET',
-    headers: headers
-  })
-    .then(response => response.json())
-    .then(data => {
-      // نمایش نام کاربری
-      document.getElementById('username').textContent = `نام کاربری: ${data.username}`;
+            const formData = new FormData();
+            formData.append("first_name", document.getElementById("first_name").value);
+            formData.append("last_name", document.getElementById("last_name").value);
+            formData.append("bio", document.getElementById("bio").value);
+            formData.append("age", document.getElementById("age").value);
 
-      // اگر پروفایل ناقص است، فرم تکمیل مشخصات را نمایش دهیم
-      if (!data.first_name || !data.last_name || !data.bio || !data.age) {
-        document.getElementById('profileCompletionForm').classList.remove('hidden');
-      } else {
-        window.location.href = "/dashboard"; // اگر پروفایل کامل است، به داشبورد هدایت می‌شود
-      }
-    })
-    .catch(error => {
-      console.error('Error checking profile completion:', error);
-    });
-}
+            const avatarInput = document.getElementById("avatar");
+            if (avatarInput.files.length > 0) {
+                formData.append("avatar", avatarInput.files[0]);
+            }
 
-// ارسال فرم تکمیل مشخصات پروفایل
-document.getElementById('profileForm').addEventListener('submit', (e) => {
-  e.preventDefault();
+            const response = await fetch("http://127.0.0.1:8000/profile/", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            });
 
-  const formData = new FormData();
-  formData.append('avatar', document.getElementById('avatarInput').files[0]);
-  formData.append('first_name', document.getElementById('firstName').value);
-  formData.append('last_name', document.getElementById('lastName').value);
-  formData.append('bio', document.getElementById('bio').value);
-  formData.append('age', document.getElementById('age').value);
-
-  fetch('/api/profile/', {
-    method: 'POST',
-    headers: headers,
-    body: formData,
-  })
-    .then(response => response.json())
-    .then(data => {
-      alert('اطلاعات پروفایل با موفقیت ذخیره شد!');
-      window.location.href = "/dashboard"; // هدایت به داشبورد پس از ذخیره موفقیت‌آمیز
-    })
-    .catch(error => {
-      console.error('Error submitting profile data:', error);
-    });
-});
-
-// وقتی صفحه بارگذاری می‌شود، پروفایل را چک می‌کنیم
-checkProfileCompletion();
-</script>
-
+            if (response.ok) {
+                window.location.replace("http://127.0.0.1:8000/dash/");
+            } else {
+                document.getElementById("error-message").textContent = "خطا در ذخیره اطلاعات!";
+                document.getElementById("error-message").classList.remove("hidden");
+            }
+        });
+    </script>
 </body>
 </html>
+
+
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>ویرایش پروفایل</title>#}
+{#    <script src="https://cdn.tailwindcss.com"></script>#}
+{#</head>#}
+{#<body class="bg-gray-100 flex justify-center items-center min-h-screen">#}
+{##}
+{#    <div class="bg-white shadow-md rounded-lg p-6 w-96">#}
+{#        <h2 class="text-2xl font-semibold text-center mb-4">ویرایش پروفایل</h2>#}
+{##}
+{#        <div id="profile-container" class="text-center mb-4">#}
+{#            <img id="avatar" src="default.jpg" class="w-24 h-24 mx-auto rounded-full border">#}
+{#            <p id="full-name" class="text-lg font-semibold mt-2"></p>#}
+{#            <p id="bio" class="text-sm text-gray-600"></p>#}
+{#        </div>#}
+{##}
+{#        <form id="profile-form" class="space-y-3">#}
+{#            <input type="text" id="first_name" placeholder="نام" class="w-full p-2 border rounded">#}
+{#            <input type="text" id="last_name" placeholder="نام خانوادگی" class="w-full p-2 border rounded">#}
+{#            <input type="number" id="age" placeholder="سن" class="w-full p-2 border rounded">#}
+{#            <textarea id="bio-input" placeholder="بیوگرافی" class="w-full p-2 border rounded"></textarea>#}
+{#            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">ذخیره تغییرات</button>#}
+{#        </form>#}
+{##}
+{#        <button id="logout" class="w-full bg-red-500 text-white p-2 mt-4 rounded">خروج</button>#}
+{#    </div>#}
+{##}
+{#    <script>#}
+{#        document.addEventListener("DOMContentLoaded", async function () {#}
+{#            const token = localStorage.getItem("jwt_token");#}
+{#            const profileId = localStorage.getItem("profile_id");#}
+{##}
+            {#if (!token || !profileId) {#}
+            {#    window.location.href = "http://127.0.0.1:8000/log/";  // انتقال به صفحه ورود#}
+{#            #}
+{##}
+{#            async function getProfile() {#}
+{#                const response = await fetch(`http://127.0.0.1:8000/profile/${profileId}/`, {#}
+{#                    method: "GET",#}
+{#                    headers: { "Authorization": `Bearer ${token}` }#}
+{#                });#}
+{##}
+{#                if (response.ok) {#}
+{#                    const data = await response.json();#}
+{#                    document.getElementById("avatar").src = data.avatar || "default.jpg";#}
+{#                    document.getElementById("full-name").innerText = data.first_name + " " + data.last_name;#}
+{#                    document.getElementById("bio").innerText = data.bio || "بیوگرافی وارد نشده";#}
+{##}
+{#                    document.getElementById("first_name").value = data.first_name;#}
+{#                    document.getElementById("last_name").value = data.last_name;#}
+{#                    document.getElementById("age").value = data.age || "";#}
+{#                    document.getElementById("bio-input").value = data.bio;#}
+{#                } else {#}
+{#                    console.error("خطا در دریافت پروفایل");#}
+{#                }#}
+{#            }#}
+{##}
+{#            async function updateProfile(event) {#}
+{#                event.preventDefault();#}
+{#                const formData = {#}
+{#                    first_name: document.getElementById("first_name").value,#}
+{#                    last_name: document.getElementById("last_name").value,#}
+{#                    age: document.getElementById("age").value,#}
+{#                    bio: document.getElementById("bio-input").value,#}
+{#                };#}
+{##}
+{#                const response = await fetch(`http://127.0.0.1:8000/profile_update/${profileId}/`, {#}
+{#                    method: "PUT",#}
+{#                    headers: {#}
+{#                        "Authorization": `Bearer ${token}`,#}
+{#                        "Content-Type": "application/json"#}
+{#                    },#}
+{#                    body: JSON.stringify(formData)#}
+{#                });#}
+{##}
+{#                if (response.ok) {#}
+{#                    alert("پروفایل با موفقیت به‌روزرسانی شد!");#}
+{#                    getProfile();  // دریافت مجدد اطلاعات جدید#}
+{#                } else {#}
+{#                    console.error("خطا در به‌روزرسانی پروفایل");#}
+{#                }#}
+{#            }#}
+{##}
+{#            async function logout() {#}
+{#                localStorage.removeItem("jwt_token");#}
+{#                localStorage.removeItem("profile_id");#}
+{#                window.location.href = "http://127.0.0.1:8000/dash";#}
+{#            }#}
+{##}
+{#            document.getElementById("profile-form").addEventListener("submit", updateProfile);#}
+{#            document.getElementById("logout").addEventListener("click", logout);#}
+{##}
+{#            getProfile();#}
+{#        });#}
+{#    </script>#}
+{##}
+{#</body>#}
+{#</html>#}

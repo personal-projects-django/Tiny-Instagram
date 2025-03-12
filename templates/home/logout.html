@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+    <div class="flex justify-between">
+      <a href="http://127.0.0.1:8000/mypro/" class="bg-blue-500 text-white p-2 rounded">پروفایل</a>
+      <a href="http://127.0.0.1:8000/postha/" class="bg-blue-500 text-white p-2 rounded">پست‌ها</a>
+      <a href="http://127.0.0.1:8000/exp/" class="bg-blue-500 text-white p-2 rounded">اکسپلور</a>
+      <a href="http://127.0.0.1:8000/out/"  class="bg-red-500 text-white p-2 rounded">خروج</a>
+    </div>
+      <button id="logout" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">خروج</button>
+<script>
+        // خروج کاربر
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('access_token');
+      window.location.replace('http://127.0.0.1:8000/log/');
+    });
+</script>
+</body>
+</html>
+
+

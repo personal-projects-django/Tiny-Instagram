@@ -120,16 +120,16 @@ class ResendOTPSerializer(serializers.Serializer):
 
 
 
-
 class UserLoginSerializer(serializers.ModelSerializer):
     username_or_email = serializers.CharField()
     password = serializers.CharField(write_only=True)
-    access_token = serializers.CharField(max_length=255,read_only=True)
-    refresh_token = serializers.CharField(max_length=255,read_only=True)
+    access_token = serializers.CharField(max_length=255, read_only=True)
+    refresh_token = serializers.CharField(max_length=255, read_only=True)
+    user_id = serializers.IntegerField(source='id', read_only=True)  # اضافه کردن id کاربر
 
     class Meta:
         model = User
-        fields = ['username_or_email','password','access_token','refresh_token']
+        fields = ['username_or_email', 'password', 'access_token', 'refresh_token', 'user_id']  # اضافه کردن id
 
     def validate(self, data):
         username_or_email = data.get('username_or_email')
@@ -138,19 +138,58 @@ class UserLoginSerializer(serializers.ModelSerializer):
         user = (User.objects.filter(username=username_or_email).first() or
                 User.objects.filter(email=username_or_email).first())
 
-        if user and User.is_verified:
-            authenticated_user = authenticate(username=username_or_email, password=password)
-            if not authenticated_user:
-                raise AuthenticationFailed('Invalid credentials try again.')
-            user_tokens = user.tokens()
+        if not user:
+            raise AuthenticationFailed('User not found')
+        if not user.is_verified:
+            raise AuthenticationFailed('Account not verified')
 
+        authenticated_user = authenticate(username=username_or_email, password=password)
+        if not authenticated_user:
+            raise AuthenticationFailed('Invalid credentials, try again.')
 
-            return {
-                'username_or_email': user.username,
-                'access_token': str(user_tokens.get('access')),
-                'refresh_token': str(user_tokens.get('refresh')),
+        user_tokens = user.tokens()
 
-            }
+        return {
+            'username_or_email': user.username,
+            'access_token': str(user_tokens.get('access')),
+            'refresh_token': str(user_tokens.get('refresh')),
+            'user_id': user.id  # ارسال user_id به فرانت‌اند
+        }
+# class UserLoginSerializer(serializers.ModelSerializer):
+#     username_or_email = serializers.CharField()
+#     password = serializers.CharField(write_only=True)
+#     access_token = serializers.CharField(max_length=255, read_only=True)
+#     refresh_token = serializers.CharField(max_length=255, read_only=True)
+#
+#     class Meta:
+#         model = User
+#         fields = ['username_or_email', 'password', 'access_token', 'refresh_token']
+#
+#     def validate(self, data):
+#         username_or_email = data.get('username_or_email')
+#         password = data.get('password')
+#
+#         user = User.objects.filter(username=username_or_email).first() or \
+#                User.objects.filter(email=username_or_email).first()
+#
+#         if not user:
+#             raise AuthenticationFailed('User not found')
+#         if not user.is_verified:
+#             raise AuthenticationFailed('Account not verified')
+#
+#         # **اینجا مقدار صحیح را برای لاگین ارسال می‌کنیم**
+#         authenticated_user = authenticate(username=user.username, password=password)
+#         if not authenticated_user:
+#             raise AuthenticationFailed('Invalid credentials, try again.')
+#
+#         user_tokens = user.tokens()
+#
+#         return {
+#             'username_or_email': user.username,
+#             'access_token': str(user_tokens.get('access')),
+#             'refresh_token': str(user_tokens.get('refresh')),
+#         }
+
 
 #                      PasswordResetRequestSerializer
 
@@ -246,7 +285,21 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    # avatar = serializers.SerializerMethodField()
+    username = serializers.CharField(source="user.username", read_only=True)
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
-        fields = ('user', 'avatar', 'bio', 'first_name', 'last_name', 'age')
+        fields = ('user', 'username', 'avatar', 'bio', 'first_name', 'last_name', 'age', 'full_name')
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}".strip()
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username','profile']

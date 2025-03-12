@@ -6,7 +6,7 @@ from post.models import Post,Comment,Like
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['user','caption','is_active','is_public']
+        fields = ['id','user','caption', 'image', 'is_active','is_public']
         extra_kwargs = {
             'user': {'read_only': True},
         }
@@ -19,7 +19,7 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('post', 'user', 'text')
+        fields = ('id','post', 'user', 'text')
         extra_kwargs = {
             'post': {'read_only': True},
             'user': {'read_only': True}
@@ -30,11 +30,15 @@ class CommentSerializer(serializers.ModelSerializer):
 #    Like
 
 class LikeSerializer(serializers.ModelSerializer):
+    like_count = serializers.SerializerMethodField()
     class Meta:
         model = Like
-        fields = ('post', 'user', 'is_liked')
+        fields = ('id','post', 'user', 'is_liked','like_count')
         extra_kwargs = {
             'post': {'read_only': True},
             'user': {'read_only': True},
             'is_liked': {'required': False}
         }
+
+    def get_like_count(self, obj):
+        return Like.objects.filter(post=obj.post, is_liked=True).count()

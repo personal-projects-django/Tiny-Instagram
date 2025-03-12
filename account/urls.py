@@ -12,7 +12,7 @@ from rest_framework.authtoken import views as auth_token
 urlpatterns = [
     # path('', TemplateView.as_view(template_name='home/base.html'), name='base'),
     # path('add', TemplateView.as_view(template_name='home/register.html'), name='add'),
-
+    path('search/', views.UserSearchView.as_view(), name='user-search'),
     # register
     path('register/', views.UserRegisterView.as_view(), name='register'),
     path('verify_otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
@@ -29,9 +29,9 @@ urlpatterns = [
     path('logout/', views.LogoutUserView.as_view(), name='logout'),
 
     # profile
-    path('profile/', views.ProfileView.as_view(), name='profile'),
-    path('profile/<int:profile_pk>/', views.ProfileView.as_view(), name='profile_get'),
-    path('profile_update/<int:profile_pk>/', views.ProfileUpdateView.as_view(), name='profile_update'),
+    path('profile/', views.PostProfileView.as_view(), name='profile'),
+    path('profile/<int:user_id>/', views.ProfileView.as_view(), name='profile_detail'),
+    path('profile/update/<int:user_id>/', views.ProfileUpdateView.as_view(), name='profile_update_detail'),
     path('profile_delete/<int:profile_pk>/', views.ProfileDeleteView.as_view(), name='profile_delete'),
 
 

@@ -1,3 +1,82 @@
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#  <meta charset="UTF-8">#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#  <title>ورود به حساب کاربری</title>#}
+{#  <script src="https://cdn.tailwindcss.com"></script>#}
+{#  <link href="/static/css/style.css" rel="stylesheet">#}
+{#</head>#}
+{#<body class="bg-gray-100 flex items-center justify-center h-screen">#}
+{#  <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">#}
+{#    <h2 class="text-2xl font-bold mb-6 text-center">ورود</h2>#}
+{#    <form id="login-form">#}
+{#      <div class="mb-4">#}
+{#        <label for="username_or_email" class="block text-sm font-medium text-gray-700">نام کاربری یا ایمیل</label>#}
+{#        <input type="text" id="username_or_email" name="username_or_email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>#}
+{#      </div>#}
+{#      <div class="mb-4">#}
+{#        <label for="password" class="block text-sm font-medium text-gray-700">گذرواژه</label>#}
+{#        <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>#}
+{#      </div>#}
+{#      <div class="flex justify-center">#}
+{#        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">ورود</button>#}
+{#      </div>#}
+{#    </form>#}
+{#    <div id="error-message" class="text-red-500 mt-4 text-center hidden"></div>#}
+{#    <p class="mt-4 text-center text-sm">حساب کاربری ندارید؟ <a href="http://127.0.0.1:8000/add/" class="text-blue-500 hover:underline">ثبت‌نام</a></p>#}
+{#  </div>#}
+{##}
+{#  <script>#}
+{#    document.getElementById("login-form").addEventListener("submit", async function(event) {#}
+{#      event.preventDefault();#}
+{##}
+{#      const username_or_email = document.getElementById("username_or_email").value;#}
+{#      const password = document.getElementById("password").value;#}
+{##}
+{#      try {#}
+{#        const response = await fetch("http://127.0.0.1:8000/login/", {#}
+{#          method: "POST",#}
+{#          headers: { "Content-Type": "application/json" },#}
+{#          body: JSON.stringify({ username_or_email, password })#}
+{#        });#}
+{##}
+{#        const result = await response.json();#}
+{##}
+{#        if (response.ok) {#}
+{#          localStorage.setItem("access_token", result.access_token);#}
+{#          localStorage.setItem("refresh_token", result.refresh_token);#}
+{##}
+{#          // ارسال درخواست برای دریافت پروفایل کاربر#}
+{#          const profileResponse = await fetch("http://127.0.0.1:8000/profile/", {#}
+{#            method: "GET",#}
+{#            headers: {#}
+{#              "Authorization": `Bearer ${result.access_token}`#}
+{#            }#}
+{#          });#}
+{##}
+{#          if (profileResponse.ok) {#}
+{#            const profileData = await profileResponse.json();#}
+{#            localStorage.setItem("profile_id", profileData.id); // ذخیره ID پروفایل#}
+{#            localStorage.setItem("avatar", profileData.avatar); // ذخیره آواتار#}
+{#          }#}
+{##}
+{#          // هدایت به صفحه پروفایل برای ثبت اطلاعات جدید#}
+{#          window.location.replace("http://127.0.0.1:8000/pro/");#}
+{#        } else {#}
+{#          throw new Error(result.detail || "نام کاربری یا رمز عبور اشتباه است.");#}
+{#        }#}
+{#      } catch (error) {#}
+{#        const errorMessage = document.getElementById("error-message");#}
+{#        errorMessage.textContent = error.message;#}
+{#        errorMessage.classList.remove("hidden");#}
+{#      }#}
+{#    });#}
+{#  </script>#}
+{#</body>#}
+{#</html>#}
+
+
 
 <!DOCTYPE html>
 <html lang="fa">
@@ -6,7 +85,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ورود به حساب کاربری</title>
   <script src="https://cdn.tailwindcss.com"></script>
-     <link href="/static/css/style.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
   <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
@@ -29,35 +108,227 @@
   </div>
 
   <script>
-    document.getElementById('login-form').addEventListener('submit', async function(event) {
+    document.getElementById("login-form").addEventListener("submit", async function(event) {
       event.preventDefault();
 
-      const username_or_email = document.getElementById('username_or_email').value;
-      const password = document.getElementById('password').value;
+      const username_or_email = document.getElementById("username_or_email").value;
+      const password = document.getElementById("password").value;
 
-      const response = await fetch('http://127.0.0.1:8000/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username_or_email, password })
-      });
+      // دیباگ اطلاعات ورودی
+      console.log("Sending Username/Email: ", username_or_email); // برای دیباگ
+      console.log("Sending Password: ", password); // برای دیباگ
 
-      const result = await response.json();
+      try {
+        const response = await fetch("http://127.0.0.1:8000/login/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username_or_email, password })
+        });
 
-      if (response.ok) {
-        localStorage.setItem('access_token', result.access_token);
-        localStorage.setItem('refresh_token', result.refresh_token);
-        window.location.replace('http://127.0.0.1:8000/dash');
-      } else {
-        const errorMessage = document.getElementById('error-message');
-        errorMessage.textContent = result.detail || 'نام کاربری یا رمز عبور اشتباه است';
-        errorMessage.classList.remove('hidden');
+        // دیباگ پاسخ سرور
+        const result = await response.json();
+        console.log("Response from Server:", result); // نمایش نتیجه
+
+        if (response.ok) {
+          // ذخیره توکن‌ها در localStorage
+          localStorage.setItem("access_token", result.access_token);
+          localStorage.setItem("refresh_token", result.refresh_token);
+          localStorage.setItem("user_id", result.user_id); // ذخیره user_id در localStorage
+
+          // هدایت به صفحه پروفایل
+          window.location.replace("http://127.0.0.1:8000/pro/");
+        } else {
+          throw new Error(result.detail || "نام کاربری یا رمز عبور اشتباه است.");
+        }
+      } catch (error) {
+        const errorMessage = document.getElementById("error-message");
+        errorMessage.textContent = error.message;
+        errorMessage.classList.remove("hidden");
       }
     });
   </script>
 </body>
 </html>
+
+
+
+
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#  <meta charset="UTF-8">#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#  <title>ورود به حساب کاربری</title>#}
+{#  <script src="https://cdn.tailwindcss.com"></script>#}
+{#  <link href="/static/css/style.css" rel="stylesheet">#}
+{#</head>#}
+{#<body class="bg-gray-100 flex items-center justify-center h-screen">#}
+{#  <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">#}
+{#    <h2 class="text-2xl font-bold mb-6 text-center">ورود</h2>#}
+{#    <form id="login-form">#}
+{#      <div class="mb-4">#}
+{#        <label for="username_or_email" class="block text-sm font-medium text-gray-700">نام کاربری یا ایمیل</label>#}
+{#        <input type="text" id="username_or_email" name="username_or_email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>#}
+{#      </div>#}
+{#      <div class="mb-4">#}
+{#        <label for="password" class="block text-sm font-medium text-gray-700">گذرواژه</label>#}
+{#        <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>#}
+{#      </div>#}
+{#      <div class="flex justify-center">#}
+{#        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">ورود</button>#}
+{#      </div>#}
+{#    </form>#}
+{#    <div id="error-message" class="text-red-500 mt-4 text-center hidden"></div>#}
+{#    <p class="mt-4 text-center text-sm">حساب کاربری ندارید؟ <a href="http://127.0.0.1:8000/add/" class="text-blue-500 hover:underline">ثبت‌نام</a></p>#}
+{#  </div>#}
+{##}
+{#  <script>#}
+{#    document.getElementById('login-form').addEventListener('submit', async function(event) {#}
+{#      event.preventDefault();#}
+{##}
+{#      const username_or_email = document.getElementById('username_or_email').value;#}
+{#      const password = document.getElementById('password').value;#}
+{##}
+{#      const response = await fetch('http://127.0.0.1:8000/login/', {#}
+{#        method: 'POST',#}
+{#        headers: {#}
+{#          'Content-Type': 'application/json'#}
+{#        },#}
+{#        body: JSON.stringify({ username_or_email, password })#}
+{#      });#}
+{##}
+{#      const result = await response.json();#}
+{##}
+{#      if (response.ok) {#}
+{#        localStorage.setItem('access_token', result.access_token);#}
+{#        localStorage.setItem('refresh_token', result.refresh_token);#}
+{##}
+{#        // دریافت اطلاعات پروفایل کاربر و ذخیره `profile_id` و `avatar`#}
+        {#const profileResponse = await fetch("http://127.0.0.1:8000/profile/", {#}
+        {#    method: "GET",#}
+        {#    headers: { "Authorization": `Bearer ${result.access_token}` }#}
+{#        #}
+{##}
+        {#if (profileResponse.ok) {#}
+        {#    const profileData = await profileResponse.json();#}
+        {#    localStorage.setItem("profile_id", profileData.id); // ذخیره ID پروفایل#}
+        {#    localStorage.setItem("avatar", profileData.avatar); // ذخیره آواتار#}
+{##}
+{##}
+{#        // هدایت به صفحه‌ی اطلاعات#}
+{#        window.location.replace('http://127.0.0.1:8000/pro/');#}
+{#      } else {#}
+{#        const errorMessage = document.getElementById('error-message');#}
+{#        errorMessage.textContent = result.detail || 'نام کاربری یا رمز عبور اشتباه است';#}
+{#        errorMessage.classList.remove('hidden');#}
+{#      }#}
+{#    });#}
+{#  </script>#}
+{#</body>#}
+{#</html>#}
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#  <meta charset="UTF-8">#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#  <title>ورود به حساب کاربری</title>#}
+{#  <script src="https://cdn.tailwindcss.com"></script>#}
+{#     <link href="/static/css/style.css" rel="stylesheet">#}
+{#</head>#}
+{#<body class="bg-gray-100 flex items-center justify-center h-screen">#}
+{#  <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">#}
+{#    <h2 class="text-2xl font-bold mb-6 text-center">ورود</h2>#}
+{#    <form id="login-form">#}
+{#      <div class="mb-4">#}
+{#        <label for="username_or_email" class="block text-sm font-medium text-gray-700">نام کاربری یا ایمیل</label>#}
+{#        <input type="text" id="username_or_email" name="username_or_email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>#}
+{#      </div>#}
+{#      <div class="mb-4">#}
+{#        <label for="password" class="block text-sm font-medium text-gray-700">گذرواژه</label>#}
+{#        <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>#}
+{#      </div>#}
+{#      <div class="flex justify-center">#}
+{#        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">ورود</button>#}
+{#      </div>#}
+{#    </form>#}
+{#    <div id="error-message" class="text-red-500 mt-4 text-center hidden"></div>#}
+{#    <p class="mt-4 text-center text-sm">حساب کاربری ندارید؟ <a href="http://127.0.0.1:8000/add/" class="text-blue-500 hover:underline">ثبت‌نام</a></p>#}
+{#  </div>#}
+{#      <script>#}
+{#    document.getElementById('login-form').addEventListener('submit', async function(event) {#}
+{#        event.preventDefault();#}
+{##}
+{#        const username_or_email = document.getElementById('username_or_email').value;#}
+{#        const password = document.getElementById('password').value;#}
+{##}
+{#        const response = await fetch('http://127.0.0.1:8000/login/', {#}
+{#            method: 'POST',#}
+{#            headers: { 'Content-Type': 'application/json' },#}
+{#            body: JSON.stringify({ username_or_email, password })#}
+{#        });#}
+{##}
+{#        const result = await response.json();#}
+{##}
+{#        if (response.ok) {#}
+{#            localStorage.setItem('access_token', result.access_token);#}
+{#            localStorage.setItem('refresh_token', result.refresh_token);#}
+{#            localStorage.setItem('profile_id', result.user_id);  // ذخیره ID کاربر#}
+{##}
+{#            // بررسی اینکه اطلاعات پروفایل پر شده یا نه#}
+{#            const profileResponse = await fetch(`http://127.0.0.1:8000/profile/${result.user_id}/`, {#}
+{#                method: 'GET',#}
+{#                headers: { 'Authorization': `Bearer ${result.access_token}` }#}
+{#            });#}
+{##}
+{#            const profile = await profileResponse.json();#}
+{##}
+{#            if (!profile.first_name || !profile.last_name) {#}
+{#                window.location.replace('http://127.0.0.1:8000/edit_profile.html'); // اطلاعات ناقص → صفحه ویرایش#}
+{#            } else {#}
+{#                window.location.replace('http://127.0.0.1:8000/home.html'); // اطلاعات کامل → صفحه اصلی#}
+{#            }#}
+{#        } else {#}
+{#            const errorMessage = document.getElementById('error-message');#}
+{#            errorMessage.textContent = result.detail || 'نام کاربری یا رمز عبور اشتباه است';#}
+{#            errorMessage.classList.remove('hidden');#}
+{#        }#}
+{#    });#}
+{#    </script>#}
+{##}
+{#  <script>#}
+{#    document.getElementById('login-form').addEventListener('submit', async function(event) {#}
+{#      event.preventDefault();#}
+{##}
+{#      const username_or_email = document.getElementById('username_or_email').value;#}
+{#      const password = document.getElementById('password').value;#}
+{##}
+{#      const response = await fetch('http://127.0.0.1:8000/login/', {#}
+{#        method: 'POST',#}
+{#        headers: {#}
+{#          'Content-Type': 'application/json'#}
+{#        },#}
+{#        body: JSON.stringify({ username_or_email, password })#}
+{#      });#}
+{##}
+{#      const result = await response.json();#}
+{##}
+{#      if (response.ok) {#}
+{#        localStorage.setItem('access_token', result.access_token);#}
+{#        localStorage.setItem('refresh_token', result.refresh_token);#}
+{#        window.location.replace('http://127.0.0.1:8000/pro/');#}
+{#      } else {#}
+{#        const errorMessage = document.getElementById('error-message');#}
+{#        errorMessage.textContent = result.detail || 'نام کاربری یا رمز عبور اشتباه است';#}
+{#        errorMessage.classList.remove('hidden');#}
+{#      }#}
+{#    });#}
+{#  </script>#}
+{#</body>#}
+{#</html>#}
 
 
 

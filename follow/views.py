@@ -11,6 +11,21 @@ from .models import Friendship
 from .serializers import UserListSerializer
 
 
+class UnfollowView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user_id = request.data.get('user')
+
+        try:
+            user = User.objects.get(pk=user_id)
+            friendship = Friendship.objects.get(request_from=request.user, request_to=user)
+        except (User.DoesNotExist, Friendship.DoesNotExist):
+            return Response({'error': 'درخواستی برای این کاربر یافت نشد'}, status=status.HTTP_400_BAD_REQUEST)
+
+        friendship.delete()
+        return Response({'detail': 'آنفالو انجام شد'}, status=status.HTTP_200_OK)
+
 
 class UserListView(APIView):
     permission_classes = [IsOwnerOrReadOnly, ]
@@ -24,7 +39,25 @@ class UserListView(APIView):
             users = User.objects.all()
         serializer = UserListSerializer(users, many=True)
         return Response(serializer.data)
-
+# class UserListView(APIView):
+#     permission_classes = [IsAuthenticated]
+#
+#     def get(self, request):
+#         friendships = Friendship.objects.filter(
+#             Q(request_from=request.user) | Q(request_to=request.user),
+#             is_accepted=True
+#         )
+#
+#         users = set()
+#         for fr in friendships:
+#             if fr.request_from == request.user:
+#                 users.add(fr.request_to)
+#             else:
+#                 users.add(fr.request_from)
+#
+#         serializer = UserListSerializer(users, many=True)
+#         return Response(serializer.data)
+#
 
 class RequestView(APIView):
     permission_classes = [IsOwnerOrReadOnly, ]

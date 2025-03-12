@@ -7,7 +7,9 @@ urlpatterns = [
     path('request/', views.RequestView.as_view()),
     path('requests-list/', views.RequestListView.as_view()),
     path('accept/', views.AcceptView.as_view()),
-    path('friends/', views.FriendListView.as_view())
+    path('friends/', views.FriendListView.as_view()),
+    path('unfollow/', views.UnfollowView.as_view()),
+
 
 ]
 

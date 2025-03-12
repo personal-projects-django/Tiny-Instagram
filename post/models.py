@@ -55,9 +55,10 @@ class Like(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.user}, {self.post}, {self.created_at}'
+        return f'{self.user.username} liked post {self.post.id}, {self.post}, {self.created_at}'
 
-
+    class Meta:
+        unique_together = ('user', 'post')
 #  follower
 
 # class following(models.Model):

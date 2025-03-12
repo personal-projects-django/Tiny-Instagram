@@ -9,7 +9,7 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     ordering = ['email']
-    list_display = ['email', 'phone','username','is_active','is_staff','is_verified','created_at']
+    list_display = ['id','email', 'phone','username','is_active','is_staff','is_verified','created_at']
     search_fields = ['username']
     readonly_fields = ['last_login']
     filter_horizontal = ['groups','user_permissions']
@@ -41,3 +41,13 @@ class OTPAdmin(admin.ModelAdmin):
     list_display = ['user','otp','email','expires_at']
 
 admin.site.register(OTP,OTPAdmin)
+
+
+
+class ProfileAdmin(admin.ModelAdmin):
+    model = Profile
+    list_display = ['id','user','full_name','age','created_at']
+
+admin.site.register(Profile,ProfileAdmin)
+
+
