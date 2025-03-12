@@ -92,7 +92,7 @@ class CommentView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # comments = Comment.objects.filter(post=post, is_approved=True)
-        comments = post.comments.filter(is_approved=True)
+        comments = post.comments.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 

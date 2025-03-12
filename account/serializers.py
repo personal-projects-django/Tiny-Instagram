@@ -92,31 +92,31 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 #         return data
 
 
-class UserVerifyOTPSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    otp = serializers.CharField(max_length=6)
-
-    def validate(self, data):
-        try:
-            otp_instance = OTP.objects.get(email=data['email'], otp=data['otp'])
-
-            if timezone.now() > otp_instance.expires_at:
-                raise serializers.ValidationError({'error': 'OTP has expired.'})
-
-            return data
-
-        except OTP.DoesNotExist:
-            raise serializers.ValidationError({'error': 'Invalid OTP.'})
-
-
-class ResendOTPSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-
-    def validate_email(self, value):
-
-        if not OTP.objects.filter(email=value).exists():
-            raise serializers.ValidationError("email does not exist.")
-        return value
+# class UserVerifyOTPSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+#     otp = serializers.CharField(max_length=6)
+#
+#     def validate(self, data):
+#         try:
+#             otp_instance = OTP.objects.get(email=data['email'], otp=data['otp'])
+#
+#             if timezone.now() > otp_instance.expires_at:
+#                 raise serializers.ValidationError({'error': 'OTP has expired.'})
+#
+#             return data
+#
+#         except OTP.DoesNotExist:
+#             raise serializers.ValidationError({'error': 'Invalid OTP.'})
+#
+#
+# class ResendOTPSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+#
+#     def validate_email(self, value):
+#
+#         if not OTP.objects.filter(email=value).exists():
+#             raise serializers.ValidationError("email does not exist.")
+#         return value
 
 
 

@@ -404,7 +404,7 @@ class ProfileUpdateView(APIView):
         if user_id:
             try:
                 profile = Profile.objects.get(user__id=user_id)
-                self.check_object_permissions(request, profile)  # بررسی دسترسی
+                self.check_object_permissions(request, profile)
             except Profile.DoesNotExist:
                 return Response({"detail": "پروفایل پیدا نشد"}, status=status.HTTP_404_NOT_FOUND)
         else:

@@ -38,6 +38,7 @@
 
 
 
+
         async function getUserProfile(userId) {
             try {
                 const response = await fetch(`http://127.0.0.1:8000/profile/${userId}/`, {
@@ -47,6 +48,14 @@
                         "Content-Type": "application/json"
                     }
                 });
+
+
+                const token = localStorage.getItem("access_token");
+
+            if (!token) {
+                window.location.replace("http://127.0.0.1:8000/log/");
+                return;
+            }
 
                 if (!response.ok) throw new Error("خطا در دریافت پروفایل");
 
@@ -64,11 +73,13 @@
         async function getUserPosts(userId) {
             try {
                 const response = await fetch(`http://127.0.0.1:8000/posts/user/${userId}/`, {
+
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
                         "Content-Type": "application/json"
                     }
+
                 });
 
                 if (!response.ok) throw new Error("خطا در دریافت پست‌ها");
@@ -80,31 +91,94 @@
             }
         }
 
-        function displayUserPosts(posts) {
-            const postsContainer = document.getElementById("posts-container");
-            postsContainer.innerHTML = '';
 
-            posts.forEach(post => {
-                const postItem = document.createElement('div');
-                postItem.classList.add('bg-white', 'p-4', 'rounded', 'shadow-md');
+async function getComments(postId) {
+    const token = localStorage.getItem("access_token");
 
-                const postImage = post.image ? `<img src="${post.image}" class="w-full h-48 object-cover rounded mb-4" />` : '';
-                const postCaption = `<p class="text-lg">${post.caption}</p>`;
+    if (!token) {
+        window.location.replace("http://127.0.0.1:8000/log/");
+        return;
+    }
 
-                const savedLikeCount = localStorage.getItem(`like-count-${post.id}`) || post.like_count || 0;
-                const isLiked = localStorage.getItem(`liked-${post.id}`) === 'true';
+    try {
+        // دریافت کامنت‌ها از API
+        const response = await fetch(`http://127.0.0.1:8000/post/${postId}/comments/`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
 
-                const likeButtonClass = isLiked ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-500 hover:bg-blue-600';
-
-                postItem.innerHTML = `
-                    ${postImage}
-                    ${postCaption}
-                    <button id="like-button-${post.id}" onclick="handleLike(${post.id})" class="like-button ${likeButtonClass} text-white px-4 py-2 rounded">لایک</button>
-                    <span id="like-count-${post.id}" class="like-count">${savedLikeCount} لایک</span>
-                `;
-                postsContainer.appendChild(postItem);
-            });
+        // بررسی وضعیت پاسخ
+        if (!response.ok) {
+            throw new Error("خطا در دریافت کامنت‌ها");
         }
+
+        const comments = await response.json();
+        console.log(comments); // بررسی داده‌های دریافتی در کنسول
+
+        // پیدا کردن عنصر برای نمایش کامنت‌ها
+        const commentsList = document.getElementById(`comments-list-${postId}`);
+        commentsList.innerHTML = '';  // پاک کردن کامنت‌های قبلی
+
+        // نمایش کامنت‌ها
+        comments.forEach(comment => {
+            const commentElement = document.createElement("div");
+            commentElement.classList.add("comment-item", "mt-2", "p-2", "border-b");
+            commentElement.innerHTML = `
+                <strong>${comment.username}</strong>: ${comment.text}  <!-- نمایش یوزرنیم -->
+            `;
+            commentsList.appendChild(commentElement);
+        });
+
+    } catch (error) {
+        console.error("خطا در دریافت کامنت‌ها:", error);
+    }
+}
+
+        // تابع برای نمایش پست‌ها و کامنت‌ها همراه با یوزرنیم
+function displayUserPosts(posts) {
+    const postsContainer = document.getElementById("posts-container");
+    postsContainer.innerHTML = ''; // پاک کردن محتوای قبلی
+
+    posts.forEach(post => {
+        const postItem = document.createElement('div');
+        postItem.classList.add('bg-white', 'p-4', 'rounded', 'shadow-md');
+
+        const postImage = post.image ? `<img src="${post.image}" class="w-full h-48 object-cover rounded mb-4" />` : '';
+        const postCaption = `<p class="text-lg">${post.caption}</p>`;
+
+        // مدیریت لایک
+        const savedLikeCount = localStorage.getItem(`like-count-${post.id}`) || post.like_count || 0;
+        const isLiked = localStorage.getItem(`liked-${post.id}`) === 'true';
+        const likeButtonClass = isLiked ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-500 hover:bg-blue-600';
+
+        postItem.innerHTML = `
+            ${postImage}
+            ${postCaption}
+            <button id="like-button-${post.id}" onclick="handleLike(${post.id})" class="like-button ${likeButtonClass} text-white px-4 py-2 rounded">لایک</button>
+            <span id="like-count-${post.id}" class="like-count">${savedLikeCount} لایک</span>
+
+            <div id="comments-section-${post.id}" class="comments-section mt-4">
+                <h3>کامنت‌ها:</h3>
+                <div id="comments-list-${post.id}"></div>
+                <textarea id="comment-text-${post.id}" class="w-full p-2 border rounded" placeholder="کامنت خود را بنویسید..."></textarea>
+                <button onclick="handleComment(${post.id})" class="bg-green-500 text-white px-4 py-2 mt-2 rounded">ارسال کامنت</button>
+            </div>
+        `;
+
+        postsContainer.appendChild(postItem);
+        loadComments(post.id); // بارگذاری کامنت‌ها
+    });
+}
+
+
+
+
+
+
+
 
         // لایک کردن پست
 async function handleLike(postId) {
@@ -162,6 +236,78 @@ async function handleLike(postId) {
                 console.error("خطا در دریافت تعداد لایک‌ها:", error);
             }
         }
+
+
+    {# comment #}
+ // تابع برای ارسال کامنت
+function handleComment(postId) {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        window.location.replace("http://127.0.0.1:8000/log/");
+        return;
+    }
+
+    const commentText = document.getElementById(`comment-text-${postId}`).value;
+
+    if (!commentText.trim()) {
+        alert("لطفاً کامنت خود را وارد کنید.");
+        return;
+    }
+
+    const data = {
+        text: commentText
+    };
+
+    fetch(`http://127.0.0.1:8000/post/${postId}/comments/`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(comment => {
+        const commentsList = document.getElementById(`comments-list-${postId}`);
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("comment-item", "mt-2", "p-2", "border-b");
+        commentElement.innerHTML = `
+            <strong>${comment.user.username}</strong>: ${comment.text}
+        `;
+        commentsList.appendChild(commentElement);
+        document.getElementById(`comment-text-${postId}`).value = ''; // پاک کردن فیلد کامنت
+    })
+    .catch(error => console.error("خطا در ارسال کامنت:", error));
+}
+
+// تابع برای بارگذاری کامنت‌ها همراه با یوزرنیم
+// تابعی برای دریافت کامنت‌ها و نمایش آن‌ها
+function loadComments(postId) {
+    fetch(`http://127.0.0.1:8000/post/${postId}/comments/`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(comments => {
+        const commentsList = document.getElementById(`comments-list-${postId}`);
+        commentsList.innerHTML = ''; // پاک کردن کامنت‌های قبلی
+        comments.forEach(comment => {
+            // ایجاد و نمایش کامنت با یوزرنیم
+            const commentElement = document.createElement("div");
+            commentElement.classList.add("comment-item", "mt-2", "p-2", "border-b");
+            commentElement.innerHTML = `
+                <strong>${comment.user.username}</strong>: ${comment.text}  <!-- نمایش یوزرنیم -->
+            `;
+            commentsList.appendChild(commentElement);
+        });
+    })
+    .catch(error => console.error("خطا در بارگذاری کامنت‌ها:", error));
+}
+
 
 
 
@@ -321,160 +467,3 @@ document.getElementById('accept-btn').addEventListener('click', async () => {
 
 </body>
 </html>
-
-
-
-
-{#<!DOCTYPE html>#}
-{#<html lang="fa">#}
-{#<head>#}
-{#    <meta charset="UTF-8">#}
-{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
-{#    <title>پروفایل کاربر</title>#}
-{#    <script src="https://cdn.tailwindcss.com"></script>#}
-{#    <link href="/static/css/style.css" rel="stylesheet">#}
-{#</head>#}
-{#<body class="bg-gray-100">#}
-{#    <div class="container mx-auto p-6">#}
-{#        <button id="back-to-search" class="bg-gray-500 text-white px-4 py-2 rounded mb-4">بازگشت</button>#}
-{##}
-{#        <!-- پروفایل کاربر -->#}
-{#        <div id="user-profile" class="bg-white p-6 rounded shadow-md">#}
-{#            <div class="flex items-center space-x-4">#}
-{#                <img id="profile-avatar" src="" alt="Avatar" class="w-24 h-24 rounded-full">#}
-{#                <div>#}
-{#                    <h2 id="profile-username" class="text-xl font-semibold"></h2>#}
-{#                    <p id="profile-fullname" class="text-gray-700"></p>#}
-{#                    <p id="profile-age" class="text-gray-600"></p>#}
-{#                    <p id="profile-bio" class="text-gray-800"></p>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <!-- پست‌های کاربر -->#}
-{#        <div id="user-posts" class="mt-6">#}
-{#            <h3 class="text-xl font-semibold mb-4">پست‌های کاربر</h3>#}
-{#            <div id="posts-container" class="space-y-4">#}
-{#                <!-- پست‌ها در اینجا نمایش داده می‌شود -->#}
-{#            </div>#}
-{#            <div id="like-posts" class="mt-6">#}
-{#        </div>#}
-{#    </div>#}
-{##}
-{#    <script>#}
-{#        // دریافت اطلاعات پروفایل از API#}
-{#        async function getUserProfile(userId) {#}
-{#            try {#}
-{#                const response = await fetch(`http://127.0.0.1:8000/profile/${userId}/`, {#}
-{#                    method: "GET",#}
-{#                    headers: {#}
-{#                        "Authorization": `Bearer ${localStorage.getItem("access_token")}`,#}
-{#                        "Content-Type": "application/json"#}
-{#                    }#}
-{#                });#}
-{##}
-{#                if (!response.ok) {#}
-{#                    throw new Error("خطا در دریافت پروفایل");#}
-{#                }#}
-{##}
-{#                const userProfile = await response.json();#}
-{##}
-{#                // نمایش اطلاعات پروفایل#}
-{#                document.getElementById("profile-avatar").src = userProfile.avatar || 'https://via.placeholder.com/150';#}
-{#                document.getElementById("profile-username").textContent = userProfile.username;#}
-{#                document.getElementById("profile-fullname").textContent = userProfile.full_name;#}
-{#                document.getElementById("profile-age").textContent = userProfile.age ? `سن: ${userProfile.age}` : "سن: نامشخص";#}
-{#                document.getElementById("profile-bio").textContent = userProfile.bio ? `بیوگرافی: ${userProfile.bio}` : "بیوگرافی ثبت نشده است";#}
-{#            } catch (error) {#}
-{#                console.error("خطا در دریافت پروفایل:", error);#}
-{#            }#}
-{#        }#}
-{##}
-        {# post user#}
-{##}
-{#        // دریافت پست‌های کاربر از API#}
-{#        async function getUserPosts(userId) {#}
-{#            try {#}
-{#                const response = await fetch(`http://127.0.0.1:8000/posts/user/${userId}/`, {#}
-{#                    method: "GET",#}
-{#                    headers: {#}
-{#                        "Authorization": `Bearer ${localStorage.getItem("access_token")}`,#}
-{#                        "Content-Type": "application/json"#}
-{#                    }#}
-{#                });#}
-{##}
-{#                if (!response.ok) {#}
-{#                    throw new Error("خطا در دریافت پست‌ها");#}
-{#                }#}
-{##}
-{#                const posts = await response.json();#}
-{#                displayUserPosts(posts);#}
-{#            } catch (error) {#}
-{#                console.error("خطا در دریافت پست‌ها:", error);#}
-{#            }#}
-{#        }#}
-{##}
-{#        // نمایش پست‌های کاربر#}
-{#        function displayUserPosts(posts) {#}
-{#            const postsContainer = document.getElementById("posts-container");#}
-{#            postsContainer.innerHTML = ''; // پاک کردن پست‌های قبلی#}
-{##}
-{#            posts.forEach(post => {#}
-{#                const postItem = document.createElement('div');#}
-{#                postItem.classList.add('bg-white', 'p-4', 'rounded', 'shadow-md');#}
-{##}
-{#                const postImage = post.image ? `<img src="${post.image}" class="w-full h-48 object-cover rounded mb-4" />` : '';#}
-{#                const postCaption = `<p class="text-lg">${post.caption}</p>`;#}
-{##}
-{#                postItem.innerHTML = `${postImage} ${postCaption}`;#}
-{#                postsContainer.appendChild(postItem);#}
-{#            });#}
-{#        }#}
-{##}
-{##}
-{##}
-{##}
-{#        // بازگشت به صفحه جستجو#}
-{#        document.getElementById("back-to-search").addEventListener("click", () => {#}
-{#            window.location.href = "/exp";  // فرض می‌کنیم صفحه اکسپلور شما `/exp` است#}
-{#        });#}
-{##}
-{#        // دریافت شناسه کاربر از URL (مثلاً /profile/15/)#}
-{#        const urlParams = new URLSearchParams(window.location.search);#}
-{#        const userId = urlParams.get("user_id");#}
-{##}
-{#        if (userId) {#}
-{#            getUserProfile(userId);#}
-{#            getUserPosts(userId);#}
-{#        } else {#}
-{#            console.error("شناسه کاربر پیدا نشد");#}
-{#        }#}
-{##}
-    {#    like post #}
-{# // لایک کردن پست#}
-{#        async function handleLike(postId) {#}
-{#            try {#}
-{#                const response = await fetch(`http://127.0.0.1:8000/post/${postId}/likes/`, {#}
-{#                    method: 'POST',#}
-{#                    headers: {#}
-{#                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,#}
-{#                        'Content-Type': 'application/json'#}
-{#                    },#}
-{#                    body: JSON.stringify({ is_liked: true })#}
-{#                });#}
-{##}
-{#                if (!response.ok) {#}
-{#                    throw new Error("خطا در لایک کردن پست");#}
-{#                }#}
-{##}
-{#                // به‌روزرسانی تعداد لایک‌ها#}
-{#                const likeCountElement = document.getElementById(`like-count-${postId}`);#}
-{#                let currentLikeCount = parseInt(likeCountElement.textContent, 10);#}
-{#                likeCountElement.textContent = currentLikeCount + 1;#}
-{#            } catch (error) {#}
-{#                console.error("خطا در لایک کردن پست:", error);#}
-{#            }#}
-{#        }#}
-{##}
-{#    </script>#}
-{#</body>#}
-{#</html>#}

@@ -17,9 +17,10 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
     class Meta:
         model = Comment
-        fields = ('id','post', 'user', 'text')
+        fields = ('id','post', 'user', 'text','username')
         extra_kwargs = {
             'post': {'read_only': True},
             'user': {'read_only': True}
