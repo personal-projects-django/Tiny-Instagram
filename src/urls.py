@@ -42,6 +42,8 @@ urlpatterns = [
     path('postha/', TemplateView.as_view(template_name='home/post.html'), name='postha'),
     path('crepost/', TemplateView.as_view(template_name='home/createpost.html'), name='crepost'),
     path('out/', TemplateView.as_view(template_name='home/logout.html'), name='out'),
+    path('passreq/', TemplateView.as_view(template_name='home/password_request.html'), name='passreq'),
+    path('passcon/', TemplateView.as_view(template_name='home/password_confirm.html'), name='passcon'),
 
 
 ]

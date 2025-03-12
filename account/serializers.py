@@ -207,8 +207,8 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             token = PasswordResetTokenGenerator().make_token(user)
             request = self.context.get('request')
             site_domain = get_current_site(request).domain
-            relative_link = reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
-            abslink = f'http://{site_domain}{relative_link}'
+            relative_link = reverse('passcon')  # به جای مسیر API از مسیر فرانت استفاده کنید
+            abslink = f'http://{site_domain}{relative_link}?uidb64={uidb64}&token={token}'
             email_body = f'Hi use the link below to reset your password \n {abslink}'
             data = {
                 'email_body': email_body,
