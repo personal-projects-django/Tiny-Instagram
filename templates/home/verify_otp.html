@@ -1,0 +1,194 @@
+<!-- verify-otp.html -->
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تایید کد OTP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
+    <h2 class="text-2xl font-bold mb-6 text-center">تایید کد OTP</h2>
+    <form id="otp-form">
+      <div class="mb-4">
+        <label for="otp" class="block text-sm font-medium text-gray-700">کد OTP</label>
+        <input type="text" id="otp" name="otp" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md" required>
+      </div>
+      <div class="flex justify-center">
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">تایید</button>
+      </div>
+    </form>
+    <div id="otp-error-message" class="text-red-500 mt-4 text-center hidden"></div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
+
+    document.getElementById('otp-form').addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const otp = document.getElementById('otp').value;
+
+      const response = await fetch('http://127.0.0.1:8000/verify_otp/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // اگر تایید OTP موفقیت‌آمیز بود، کاربر را به داشبورد هدایت می‌کنیم
+        window.location.href = 'http://127.0.0.1:8000/log';  // صفحه داشبورد
+      } else {
+        const errorMessage = document.getElementById('otp-error-message');
+        errorMessage.textContent = result.message || 'کد OTP اشتباه است';
+        errorMessage.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#    <title>تأیید OTP</title>#}
+{#</head>#}
+{#<body>#}
+{#    <h1>تأیید کد OTP</h1>#}
+{#    <p>یک کد ۶ رقمی به ایمیل شما ارسال شده است. لطفاً آن را وارد کنید.</p>#}
+{##}
+{#    <form id="verifyOtpForm">#}
+{#        <input type="text" id="otp" placeholder="کد ۶ رقمی"><br>#}
+{#        <input type="submit" value="submit" id="تایید">#}
+{##}
+{#        <button onclick="verifyOTP()">Verify</button>#}
+{#    </form>#}
+{#</body>#}
+{##}
+{#    <script>#}
+{#        const urlParams = new URLSearchParams(window.location.search);#}
+{#        const email = urlParams.get('email');#}
+{##}
+{#        document.getElementById("verifyOtpForm").onsubmit = function(e) {#}
+{#        e.preventDefault();#}
+{#        fetch("http://127.0.0.1:8000/verify_otp/", {#}
+{#            method: "POST",#}
+{#            headers: { "Content-Type": "application/json" },#}
+{#            body: JSON.stringify({#}
+{#                email: email,#}
+{#                otp: document.getElementById("otp").value#}
+{#            })#}
+{#        })#}
+{##}
+{#        .then(response => response.json())#}
+{#        .then(data => window.location.replace('http://127.0.0.1:8000/'))#}
+{#            .catch(error =>{#}
+{#                console.log(error)#}
+{#            })#}
+{##}
+{#    };#}
+{#    </script>#}
+{##}
+{#</html>#}
+
+
+{#.then(response => response.json())#}
+{#            .then(data => {#}
+{#                if (data.message) {#}
+{#                    alert(data.message);#}
+{#                    window.location.href = 'profile.html';#}
+{#                } else {#}
+{#                    alert('Invalid OTP');#}
+{#                }#}
+{#            });#}
+{#===================================================#}
+{#<!DOCTYPE html>#}
+{#<html>#}
+{#<head>#}
+{#    <title>Verify OTP</title>#}
+{#    <script>#}
+{#        function verifyOTP() {#}
+{#            let email = localStorage.getItem('email');#}
+{#            let otp = document.getElementById('otp').value;#}
+{#            fetch('http://127.0.0.1:8000/verify_otp/', {#}
+{#                method: 'POST',#}
+{#                headers: {'Content-Type': 'application/json'},#}
+{#                body: JSON.stringify({email: email, otp: otp})#}
+{#            })#}
+{#            .then(response => response.json())#}
+{#            .then(data => window.location.replace('http://127.0.0.1:8000/'))#}
+{#                .catch(error =>{#}
+{#                    console.log(error)#}
+{#                })#}
+{#            #}
+{#        }#}
+{##}
+{#        function resendOTP() {#}
+{#            let email = localStorage.getItem('email');#}
+{#            fetch('http://127.0.0.1:8000/resend-otp/', {#}
+{#                method: 'POST',#}
+{#                headers: {'Content-Type': 'application/json'},#}
+{#                body: JSON.stringify({email: email})#}
+{#            })#}
+{#            .then(response => response.json())#}
+{#            .then(data => window.location.replace('http://127.0.0.1:8000/'))#}
+{#                .catch(error =>{#}
+{#                    console.log(error)#}
+{#                })#}
+{#            ;#}
+{#        }#}
+{#    </script>#}
+{#</head>#}
+{#<body>#}
+{#    <h2>Verify OTP</h2>#}
+{#    <input type="text" id="otp" placeholder="Enter OTP">#}
+{#    <button onclick="verifyOTP()">Verify</button>#}
+{#    <button onclick="resendOTP()">Resend OTP</button>#}
+{#</body>#}
+{#</html>#}
+
+
+{#================================#}
+
+
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>تأیید حساب</title>#}
+{#    <link rel="stylesheet" href="">#}
+{#</head>#}
+{#<body>#}
+{#    <div class="container">#}
+{#        <h2>تأیید حساب</h2>#}
+{#        <form id="verify-otp-form">#}
+{#            <label for="email">ایمیل:</label>#}
+{#            <input type="email" id="email" name="email" required>#}
+{##}
+{#            <label for="otp">کد تایید:</label>#}
+{#            <input type="text" id="otp" name="otp" maxlength="6" required>#}
+{##}
+{#            <button type="submit">تأیید</button>#}
+{#        </form>#}
+{##}
+{#        <!-- دکمه ارسال مجدد OTP -->#}
+{#        <button id="resend-otp" style="display: none;">درخواست کد جدید</button>#}
+{##}
+{#        <div id="message"></div>#}
+{#    </div>#}
+{##}
+
+{#</body>#}
+{#</html>#}

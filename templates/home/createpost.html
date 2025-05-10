@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ایجاد پست جدید</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+
+    <!-- عنوان صفحه -->
+    <div class="text-center mt-10">
+      <h1 class="text-2xl font-bold">ایجاد پست جدید</h1>
+    </div>
+
+    <!-- فرم ایجاد پست -->
+    <div class="mt-10 max-w-2xl mx-auto">
+      <form id="post-form" enctype="multipart/form-data" class="space-y-4">
+        <!-- فیلد توضیحات پست -->
+        <div>
+          <label for="caption" class="block text-lg">توضیحات پست</label>
+          <textarea id="caption" class="w-full p-3 border rounded" rows="6" placeholder="توضیحات پست خود را وارد کنید..."></textarea>
+        </div>
+
+        <!-- فیلد انتخاب تصویر -->
+        <div>
+          <label for="image" class="block text-lg">تصویر پست</label>
+          <input type="file" id="image" class="w-full p-3 border rounded" accept="image/*">
+        </div>
+
+        <!-- دکمه ارسال پست -->
+        <div>
+          <button type="submit" class="bg-blue-500 text-white px-6 py-3 rounded-full w-full">ارسال پست</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- پیام موفقیت یا خطا -->
+    <div id="error-message" class="text-red-500 text-center hidden mt-6">خطا در ارسال پست</div>
+    <div id="success-message" class="text-green-500 text-center hidden mt-6">پست با موفقیت ارسال شد</div>
+
+      <!-- دکمه بازگشت -->
+    <div class="mt-6 text-center">
+      <a href="http://127.0.0.1:8000/postha/" id="back-button" class="bg-gray-500 text-white px-6 py-2 rounded-full">بازگشت به پست‌ها</a>
+
+    </div>
+  </div>
+
+  <script>
+              // تابع برای استخراج `user_id` از Access Token
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split('.')[1])); // بخش Payload توکن
+        } catch (e) {
+            return null;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const accessToken = localStorage.getItem("access_token");
+
+      // چک کردن وضعیت لاگین
+      if (!accessToken) {
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+
+      // استخراج `user_id` از توکن
+      const userData = parseJwt(accessToken);
+      const userId = userData ? userData.user_id : null;
+
+      if (!userId) {
+        console.error("شناسه کاربر یافت نشد!");
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+    {#  ==================================================================#}
+    // ارسال پست به بک اند
+    document.getElementById("post-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const caption = document.getElementById("caption").value.trim();
+      const image = document.getElementById("image").files[0];
+
+      if (!caption || !image) {
+        alert("لطفاً تمامی فیلدها را پر کنید");
+        return;
+      }
+
+      const accessToken = localStorage.getItem("access_token");
+      if (!accessToken) {
+        alert("ابتدا وارد شوید");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("caption", caption);
+      formData.append("image", image);
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/post/", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+          },
+          body: formData
+        });
+
+        if (response.ok) {
+          document.getElementById("success-message").classList.remove("hidden");
+          document.getElementById("error-message").classList.add("hidden");
+          document.getElementById("post-form").reset();
+        } else {
+          throw new Error("خطا در ارسال پست");
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById("error-message").classList.remove("hidden");
+        document.getElementById("success-message").classList.add("hidden");
+      }
+
+
+      document.getElementById("back-button").addEventListener("click", () => {
+    if (document.referrer) {
+      window.history.back(); // اگر صفحه قبلی موجود باشد، به آن باز می‌گردد.
+    } else {
+      window.location.href = "http://127.0.0.1:8000/postha/"; // در غیر اینصورت به صفحه‌ی پست‌ها هدایت می‌شود.
+    }
+  });
+
+
+    });})
+  </script>
+</body>
+</html>

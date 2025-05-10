@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+{#    <script src="common.js"></script>#}
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+    <div class="flex justify-between">
+      <a href="http://127.0.0.1:8000/mypro/" class="bg-blue-500 text-white p-2 rounded">پروفایل</a>
+      <a href="http://127.0.0.1:8000/postha/" class="bg-blue-500 text-white p-2 rounded">پست‌ها</a>
+      <a href="http://127.0.0.1:8000/exp/" class="bg-blue-500 text-white p-2 rounded">اکسپلور</a>
+      <a href="http://127.0.0.1:8000/out/" class="bg-red-500 text-white p-2 rounded">خروج</a>
+    </div>
+    {#    <!-- پروفایل کاربر -->#}
+    <div class="mt-10" id="profile-section">
+      <div class="flex items-center">
+        <img id="profile-avatar" src="" alt="Profile Avatar" class="rounded-full w-32 h-32">
+        <div class="ml-4">
+          <h2 id="profile-username" class="text-xl font-bold">نام کاربری</h2>
+          <p id="profile-fullname" class="text-sm">نام و نام خانوادگی</p>
+          <p id="profile-bio" class="text-sm text-gray-600">بیوگرافی</p>
+          <p id="profile-age" class="text-sm text-gray-600">سن</p>
+          <a href="http://127.0.0.1:8000/edpro/" id="edit-profile" class="bg-yellow-500 text-white p-2 rounded mt-4 ">ویرایش پروفایل</a>
+</div>
+      <div id="error-message" class="text-red-500 mt-4 hidden">مشکلی پیش آمده است!</div>
+    </div>
+      <script>
+            // تابع برای استخراج `user_id` از Access Token
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split('.')[1])); // بخش Payload توکن
+        } catch (e) {
+            return null;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const accessToken = localStorage.getItem("access_token");
+
+      // چک کردن وضعیت لاگین
+      if (!accessToken) {
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+
+      // استخراج `user_id` از توکن
+      const userData = parseJwt(accessToken);
+      const userId = userData ? userData.user_id : null;
+
+      if (!userId) {
+        console.error("شناسه کاربر یافت نشد!");
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+
+      // بارگذاری پروفایل کاربر فعلی با استفاده از شناسه کاربر
+      try {
+        const profileResponse = await fetch(`http://127.0.0.1:8000/profile/${userId}/`, { // درخواست با شناسه کاربر
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          document.getElementById('profile-avatar').src = profileData.avatar || '/default-avatar.png';
+          document.getElementById('profile-username').textContent = profileData.username || 'نام کاربری نامشخص';
+          document.getElementById('profile-fullname').textContent = profileData.full_name.trim() || 'نام کامل ثبت نشده';
+          document.getElementById('profile-bio').textContent = profileData.bio ? `بیو: ${profileData.bio}` : 'بیوگرافی ثبت نشده است';
+          document.getElementById('profile-age').textContent = profileData.age ? `سن: ${profileData.age}` : 'سن ثبت نشده است';
+        } else {
+          throw new Error('خطا در دریافت اطلاعات پروفایل');
+        }
+      } catch (error) {
+        document.getElementById('error-message').classList.remove('hidden');
+        console.error('خطا در دریافت اطلاعات پروفایل:', error);
+      }
+    });
+      </script>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+  <!-- هدر با دکمه‌ها -->
+  <div class="container mx-auto p-6">
+    <div class="flex justify-between">
+      <a href="http://127.0.0.1:8000/mypro/" class="bg-blue-500 text-white p-2 rounded">پروفایل</a>
+      <a href="http://127.0.0.1:8000/postha/" class="bg-blue-500 text-white p-2 rounded">پست‌ها</a>
+      <a href="http://127.0.0.1:8000/exp/" class="bg-blue-500 text-white p-2 rounded">اکسپلور</a>
+      <a href="http://127.0.0.1:8000/out/" class="bg-red-500 text-white p-2 rounded">خروج</a>
+    </div>
+  </div>
+
+  <!-- دکمه "ایجاد پست جدید" در زیر هدر -->
+  <div class="flex justify-center mt-10">
+    <a href="http://127.0.0.1:8000/crepost/" class="bg-green-500 text-white p-3 rounded-full shadow-lg">ایجاد پست جدید</a>
+  </div>
+
+
+
+    <!-- نمایش پست‌های کاربر -->
+    <div id="user-posts" class="mt-6">
+      <!-- پست‌ها اینجا نمایش داده می‌شوند -->
+    </div>
+<div id="user-p" class="mt-6">
+
+      <script>
+            // تابع برای استخراج `user_id` از Access Token
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split('.')[1])); // بخش Payload توکن
+        } catch (e) {
+            return null;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const accessToken = localStorage.getItem("access_token");
+
+      // چک کردن وضعیت لاگین
+      if (!accessToken) {
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+
+      // استخراج `user_id` از توکن
+      const userData = parseJwt(accessToken);
+      const userId = userData ? userData.user_id : null;
+
+      if (!userId) {
+        console.error("شناسه کاربر یافت نشد!");
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+
+
+try {
+        const response = await fetch('http://127.0.0.1:8000/post_list/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('خطا در دریافت پست‌ها');
+        }
+
+        const posts = await response.json();
+        displayPosts(posts);
+      } catch (error) {
+        console.error('خطا در دریافت پست‌ها:', error);
+      }
+
+      // تابع برای نمایش پست‌ها
+      function displayPosts(posts) {
+        const postsContainer = document.getElementById('user-posts');
+        postsContainer.innerHTML = ''; // پاک کردن نتایج قبلی
+
+        posts.forEach(post => {
+          const postItem = document.createElement('div');
+          postItem.classList.add('mb-6', 'p-4', 'border', 'rounded', 'shadow-lg');
+          postItem.innerHTML = `
+            <div class="text-lg font-semibold">${post.caption}</div>
+            <img src="${post.image}" alt="Post Image" class="w-54 h-54 object-cover rounded">
+          `;
+          postsContainer.appendChild(postItem);
+        });
+      }
+
+    });
+      {# delete post #}
+          async function loadUserPosts() {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/post_list/", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("خطا در دریافت پست‌ها");
+      }
+
+      const posts = await response.json();
+      const postsContainer = document.getElementById("user-p");
+      postsContainer.innerHTML = "";
+
+      posts.forEach(post => {
+        console.log("Post ID:", post.id); // بررسی مقدار post.id در کنسول
+
+        const postItem = document.createElement("div");
+        postItem.classList.add("p-4", "border", "rounded", "mb-4", "relative");
+
+        postItem.innerHTML = `
+          <button class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded delete-post-btn"
+                  data-post-id="${post.id}">
+            حذف
+          </button>
+          <img src="${post.image}" alt="Post Image" class="w-32 h-32 object-cover rounded mb-2">
+          <p class="text-gray-600">${post.caption}</p>
+        `;
+
+        postsContainer.appendChild(postItem);
+      });
+
+      // اضافه کردن رویداد حذف به دکمه‌ها
+      document.querySelectorAll(".delete-post-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+          const postId = event.target.getAttribute("data-post-id");
+
+          // بررسی مقدار postId قبل از ارسال درخواست حذف
+          if (!postId || postId === "undefined") {
+            console.error("خطا: مقدار postId نامعتبر است!");
+            alert("خطا: شناسه پست نامعتبر است!");
+            return;
+          }
+
+          if (confirm("آیا مطمئن هستید که می‌خواهید این پست را حذف کنید؟")) {
+            try {
+              const deleteUrl = `http://127.0.0.1:8000/post_delete/${postId}/`;
+              console.log("درخواست حذف برای:", deleteUrl); // بررسی مسیر درخواست
+
+              const response = await fetch(deleteUrl, {
+                method: "DELETE",
+                headers: {
+                  "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                },
+              });
+
+              if (response.ok) {
+                event.target.parentElement.remove(); // حذف پست از صفحه
+                alert("پست با موفقیت حذف شد.");
+              } else {
+                alert("خطا در حذف پست!");
+              }
+            } catch (error) {
+              console.error("خطا در حذف پست:", error);
+            }
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error("خطا در دریافت پست‌ها:", error);
+    }
+  }
+
+  // بارگذاری پست‌ها هنگام اجرای صفحه
+  loadUserPosts();
+      </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ویرایش پروفایل</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+  <div class="container mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-4">ویرایش پروفایل</h2>
+
+    <form id="edit-profile-form" class="bg-white p-6 rounded shadow-md" enctype="multipart/form-data">
+      <label class="block mb-2">نام:</label>
+      <input type="text" id="first_name" class="w-full p-2 border rounded mb-4">
+
+      <label class="block mb-2">نام خانوادگی:</label>
+      <input type="text" id="last_name" class="w-full p-2 border rounded mb-4">
+
+      <label class="block mb-2">بیوگرافی:</label>
+      <textarea id="bio" class="w-full p-2 border rounded mb-4"></textarea>
+
+      <label class="block mb-2">سن:</label>
+      <input type="number" id="age" class="w-full p-2 border rounded mb-4">
+
+      <label class="block mb-2">آواتار:</label>
+      <input type="file" id="avatar" class="w-full p-2 border rounded mb-4">
+
+      <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full">ذخیره تغییرات</button>
+    </form>
+
+    <p id="success-message" class="text-green-500 mt-4 hidden">تغییرات با موفقیت ذخیره شد!</p>
+    <p id="error-message" class="text-red-500 mt-4 hidden">مشکلی پیش آمد، لطفا دوباره تلاش کنید!</p>
+  </div>
+  <!-- دکمه بازگشت -->
+<button type="button" onclick="goBack()" class="bg-gray-500 text-white p-2 rounded w-full mt-2">
+  بازگشت به صفحه قبل
+</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+
+<script>
+     function goBack() {
+    window.history.back();
+  }
+  document.addEventListener('DOMContentLoaded', async () => {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+      console.log("توکن JWT موجود نیست!");
+      window.location.replace('/login/');
+      return;
+    }
+
+    try {
+      // دریافت userId در لحظه اجرا
+      const decodedToken = jwt_decode(accessToken);
+      console.log("شناسه کاربر از توکن:", decodedToken.user_id);
+
+      // گرفتن اطلاعات پروفایل برای نمایش در فرم
+      const response = await fetch(`http://127.0.0.1:8000/profile/${decodedToken.user_id}/`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("اطلاعات پروفایل دریافت شده:", data);
+        document.getElementById('first_name').value = data.first_name || '';
+        document.getElementById('last_name').value = data.last_name || '';
+        document.getElementById('bio').value = data.bio || '';
+        document.getElementById('age').value = data.age || '';
+      } else {
+        console.log("خطا در دریافت اطلاعات پروفایل:", response.statusText);
+      }
+    } catch (error) {
+      console.error("خطا در دریافت اطلاعات:", error);
+    }
+
+    // ارسال اطلاعات به سرور برای بروزرسانی
+    document.getElementById('edit-profile-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData();
+      let hasChanges = false;
+
+      // دریافت userId در لحظه ارسال درخواست
+      const accessToken = localStorage.getItem("access_token");
+      const decodedToken = jwt_decode(accessToken);
+      const userId = decodedToken.user_id; // مقداردهی userId
+
+      if (!userId) {
+        console.log("شناسه کاربر یافت نشد.");
+        return;
+      }
+
+      // بررسی فیلدهای تغییر یافته
+      const firstName = document.getElementById('first_name').value;
+      const lastName = document.getElementById('last_name').value;
+      const bio = document.getElementById('bio').value;
+      const age = document.getElementById('age').value;
+      const avatarFile = document.getElementById('avatar').files[0];
+
+      if (firstName !== '') {
+        formData.append("first_name", firstName);
+        hasChanges = true;
+      }
+
+      if (lastName !== '') {
+        formData.append("last_name", lastName);
+        hasChanges = true;
+      }
+
+      if (bio !== '') {
+        formData.append("bio", bio);
+        hasChanges = true;
+      }
+
+      if (age !== '') {
+        formData.append("age", age);
+        hasChanges = true;
+      }
+
+      if (avatarFile) {
+        formData.append("avatar", avatarFile);
+        hasChanges = true;
+      }
+
+      if (!hasChanges) {
+        console.log("هیچ تغییری در فرم وجود ندارد.");
+        document.getElementById('error-message').textContent = "هیچ تغییری اعمال نشده است.";
+        document.getElementById('error-message').classList.remove('hidden');
+        return;
+      }
+
+      // ارسال درخواست PUT
+      try {
+        console.log("در حال ارسال درخواست PUT به سرور...");
+        const updateResponse = await fetch(`http://127.0.0.1:8000/profile/update/${userId}/`, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+          },
+          body: formData
+        });
+
+        if (updateResponse.ok) {
+          console.log("درخواست با موفقیت ارسال شد.");
+          document.getElementById('success-message').classList.remove('hidden');
+          setTimeout(() => window.location.href = 'http://127.0.0.1:8000/dash/');
+        } else {
+          console.log("خطا در ارسال درخواست PUT:", updateResponse.statusText);
+          document.getElementById('error-message').classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error("خطا در ارسال درخواست PUT:", error);
+        document.getElementById('error-message').classList.remove('hidden');
+      }
+    });
+  });
+</script>
+
+
+
+</body>
+</html>

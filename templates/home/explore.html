@@ -1,0 +1,478 @@
+{#<!DOCTYPE html>#}
+{#<html lang="fa">#}
+{#<head>#}
+{#  <meta charset="UTF-8">#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#  <title>داشبورد</title>#}
+{#  <script src="https://cdn.tailwindcss.com"></script>#}
+{#    <script src="common.js"></script>#}
+{#  <link href="/static/css/style.css" rel="stylesheet">#}
+{#</head>#}
+{#<body class="bg-gray-100">#}
+{#  <div class="container mx-auto p-6">#}
+{#    <div class="flex justify-between">#}
+{#      <a href="http://127.0.0.1:8000/mypro/" class="bg-blue-500 text-white p-2 rounded">پروفایل</a>#}
+{#      <a href="http://127.0.0.1:8000/postha/" class="bg-blue-500 text-white p-2 rounded">پست‌ها</a>#}
+{#      <a href="http://127.0.0.1:8000/exp/" class="bg-blue-500 text-white p-2 rounded">اکسپلور</a>#}
+{#      <a href="http://127.0.0.1:8000/out/" class="bg-red-500 text-white p-2 rounded">خروج</a>#}
+{#    </div>#}
+{#          <!-- بخش جستجوی اکسپلور -->#}
+{#    <div id="explore-section" class="mt-10">#}
+{#  <div class="mb-6">#}
+{#    <input id="search-input" type="text" placeholder="جستجو بر اساس یوزرنیم" class="p-2 rounded border w-full">#}
+{#  </div>#}
+{#  <div id="search-results" class="space-y-4">#}
+{#    <!-- نتایج جستجو اینجا نمایش داده می‌شود -->#}
+{#  </div>#}
+{#</div>#}
+{#<!-- 🔹 بخش نمایش پروفایل (مخفی در ابتدا) -->#}
+{#<div id="profile-section" class="hidden bg-white p-6 rounded shadow-md mt-6">#}
+{#    <button id="back-to-search" class="bg-gray-500 text-white px-4 py-2 rounded mb-4">بازگشت</button>#}
+{#    <div class="flex items-center space-x-4">#}
+{#        <img id="profile-avatar" src="" alt="Avatar" class="w-24 h-24 rounded-full">#}
+{#        <div>#}
+{#            <h2 id="profile-username" class="text-xl font-semibold"></h2>#}
+{#            <p id="profile-fullname" class="text-gray-700"></p>#}
+{#            <p id="profile-age" class="text-gray-600"></p>#}
+{#            <p id="profile-bio" class="text-gray-800"></p>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{##}
+{#      <script>#}
+{#     // تابع برای استخراج `user_id` از Access Token#}
+{#    function parseJwt(token) {#}
+{#        try {#}
+{#            return JSON.parse(atob(token.split('.')[1])); // بخش Payload توکن#}
+{#        } catch (e) {#}
+{#            return null;#}
+{#        }#}
+{#    }#}
+{##}
+{#    document.addEventListener('DOMContentLoaded', async () => {#}
+{#      const accessToken = localStorage.getItem("access_token");#}
+{##}
+{#      // چک کردن وضعیت لاگین#}
+{#      if (!accessToken) {#}
+{#        document.getElementById('error-message').classList.remove('hidden');#}
+{#        return;#}
+{#      }#}
+{##}
+{#      // استخراج `user_id` از توکن#}
+{#      const userData = parseJwt(accessToken);#}
+{#      const userId = userData ? userData.user_id : null;#}
+{##}
+{#      if (!userId) {#}
+{#        console.error("شناسه کاربر یافت نشد!");#}
+{#        document.getElementById('error-message').classList.remove('hidden');#}
+{#        return;#}
+{##}
+{#      }#}
+{#async function displayUserProfile(userId) {#}
+{#    try {#}
+{#        const response = await fetch(`http://127.0.0.1:8000/profile/${userId}/`, {#}
+{#            method: "GET",#}
+{#            headers: {#}
+{#                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,#}
+{#                "Content-Type": "application/json"#}
+{#            }#}
+{#        });#}
+{##}
+{#        if (!response.ok) {#}
+{#            throw new Error("خطا در دریافت پروفایل");#}
+{#        }#}
+{##}
+{#        const userProfile = await response.json();#}
+{##}
+{#        // نمایش اطلاعات در صفحه#}
+{#        document.getElementById("profile-avatar").src = userProfile.avatar || 'https://via.placeholder.com/150';#}
+{#        document.getElementById("profile-username").textContent = `نام کاربری: ${userProfile.username}`;#}
+{#        document.getElementById("profile-fullname").textContent = `نام کامل: ${userProfile.full_name}`;#}
+{#        document.getElementById("profile-age").textContent = `سن: ${userProfile.age ? userProfile.age : "نامشخص"}`;#}
+{#        document.getElementById("profile-bio").textContent = `بیوگرافی: ${userProfile.bio ? userProfile.bio : "بیوگرافی ثبت نشده است"}`;#}
+{##}
+{#        // نمایش بخش پروفایل و مخفی کردن جستجو#}
+{#        document.getElementById("profile-section").classList.remove("hidden");#}
+{#        document.getElementById("explore-section").classList.add("hidden");#}
+{##}
+{#    } catch (error) {#}
+{#        console.error("خطا در دریافت پروفایل:", error);#}
+{#    }#}
+{#}#}
+{##}
+{#// اضافه کردن قابلیت بازگشت به صفحه جستجو#}
+{#document.getElementById("back-to-search").addEventListener("click", () => {#}
+{#    document.getElementById("profile-section").classList.add("hidden");#}
+{#    document.getElementById("explore-section").classList.remove("hidden");#}
+{#});#}
+{##}
+{##}
+{#// نمایش اطلاعات پروفایل در صفحه#}
+{#function updateProfileUI(profile) {#}
+{#    const profileContainer = document.getElementById("profile-section");#}
+{##}
+{#    profileContainer.innerHTML = `#}
+{#        <div class="bg-white p-6 rounded-lg shadow-md">#}
+{#            <img src="${profile.avatar || 'https://via.placeholder.com/150'}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto">#}
+{#            <h2 class="text-center text-2xl mt-2">${profile.full_name || profile.username}</h2>#}
+{#            <p class="text-center text-gray-600">${profile.bio || "بیوگرافی موجود نیست"}</p>#}
+{#            <p class="text-center text-sm text-gray-500">سن: ${profile.age || "?"}</p>#}
+{#            <button onclick="closeProfile()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full">بستن</button>#}
+{#        </div>#}
+{#    `;#}
+{##}
+{#    profileContainer.classList.remove("hidden");  // نمایش باکس پروفایل#}
+{#}#}
+{##}
+{#// بستن پروفایل#}
+{#function closeProfile() {#}
+{#    document.getElementById("profile-section").classList.add("hidden");#}
+{#}#}
+{##}
+{#// اضافه کردن عملکرد برای کلیک روی "مشاهده پروفایل"#}
+{#document.addEventListener("click", (event) => {#}
+{#    if (event.target.classList.contains("view-profile-btn")) {#}
+{#        event.preventDefault();#}
+{#        const userId = event.target.dataset.userId;#}
+{#        displayUserProfile(userId);#}
+{#    }#}
+{#});#}
+{#// جستجوی کاربران بر اساس یوزرنیم#}
+{#document.getElementById('search-input').addEventListener('input', async (e) => {#}
+{#    const query = e.target.value.trim();#}
+{#    if (query.length < 3) {#}
+{#        document.getElementById('search-results').innerHTML = '';#}
+{#        return;#}
+{#    }#}
+{##}
+{#    try {#}
+{#        const response = await fetch(`http://127.0.0.1:8000/search/?search=${query}`, {#}
+{#            method: "GET",#}
+{#            headers: {#}
+{#                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,#}
+{#                "Content-Type": "application/json"#}
+{#            }#}
+{#        });#}
+{##}
+{#        if (!response.ok) {#}
+{#            throw new Error('خطا در جستجو');#}
+{#        }#}
+{##}
+{#        const users = await response.json();#}
+{#        displaySearchResults(users);#}
+{#    } catch (error) {#}
+{#        console.error('خطا در جستجو:', error);#}
+{#    }#}
+{#});#}
+{##}
+{#// نمایش نتایج جستجو در صفحه#}
+{#function displaySearchResults(users) {#}
+{#    const resultsContainer = document.getElementById('search-results');#}
+{#    resultsContainer.innerHTML = ''; // پاک کردن نتایج قبلی#}
+{##}
+{#    users.forEach(user => {#}
+{#        const avatarUrl = user.profile?.avatar || 'https://via.placeholder.com/150';#}
+{##}
+{#        const resultItem = document.createElement('div');#}
+{#        resultItem.classList.add('flex', 'items-center', 'space-x-4', 'border-b', 'py-2');#}
+{##}
+{#        resultItem.innerHTML = `#}
+{#            <img src="${avatarUrl}" alt="Avatar" class="rounded-full w-12 h-12">#}
+{#            <div>#}
+{#                <h3 class="text-lg">${user.username}</h3>#}
+{#                <button class="text-blue-500 view-profile-btn" data-user-id="${user.id}">مشاهده پروفایل</button>#}
+{#            </div>#}
+{#        `;#}
+{#        resultsContainer.appendChild(resultItem);#}
+{#    });#}
+{#}#}
+{##}
+{#// اضافه کردن عملکرد برای دکمه مشاهده پروفایل#}
+{#document.addEventListener("click", (event) => {#}
+{#    if (event.target.classList.contains("view-profile-btn")) {#}
+{#        event.preventDefault();#}
+{#        const userId = event.target.dataset.userId;#}
+{#        displayUserProfile(userId);#}
+{#    }#}
+{#    // دکمه مشاهده پروفایل#}
+{#const viewProfileBtn = resultItem.querySelector('.view-profile-btn');#}
+{#viewProfileBtn.addEventListener('click', (e) => {#}
+{#    e.preventDefault(); // جلوگیری از تغییر لینک#}
+{#    const userId = user.id;#}
+{#    window.location.href = `http://127.0.0.1:8000/prosec?user_id=${userId}`; // انتقال به صفحه پروفایل#}
+{#});#}
+{##}
+{#});})#}
+{##}
+{#    // جستجوی کاربران بر اساس یوزرنیم#}
+{#    document.getElementById('search-input').addEventListener('input', async (e) => {#}
+{#    const query = e.target.value;#}
+{#    if (query.length < 3) {#}
+{#      document.getElementById('search-results').innerHTML = '';#}
+{#      return;#}
+{#    }#}
+{##}
+{#    try {#}
+{#      const response = await fetch(`http://127.0.0.1:8000/search/?search=${query}`, {  // اصلاح URL#}
+{#        method: "GET",#}
+{#        headers: {#}
+{#          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,#}
+{#          "Content-Type": "application/json"#}
+{#        }#}
+{#      });#}
+{##}
+{#      if (response.ok) {#}
+{#        const users = await response.json();#}
+{#        displaySearchResults(users);#}
+{#      } else {#}
+{#        throw new Error('خطا در جستجو');#}
+{#      }#}
+{#    } catch (error) {#}
+{#      console.error('خطا در جستجو:', error);#}
+{#    }#}
+{#  });#}
+{##}
+{#  // نمایش نتایج جستجو#}
+{#  function displaySearchResults(users) {#}
+{#    const resultsContainer = document.getElementById('search-results');#}
+{#    resultsContainer.innerHTML = ''; // پاک کردن نتایج قبلی#}
+{##}
+{#    users.forEach(user => {#}
+{#      const avatarUrl = user.profile && user.profile.avatar ? user.profile.avatar : 'https://via.placeholder.com/150';  // از تصویر پیش‌فرض استفاده کن#}
+{##}
+{#      const resultItem = document.createElement('div');#}
+{#      resultItem.classList.add('flex', 'items-center', 'space-x-4', 'border-b', 'py-2');#}
+{#      resultItem.innerHTML = `#}
+{#        <img src="${avatarUrl}" alt="Avatar" class="rounded-full w-12 h-12">#}
+{#        <div>#}
+{#          <h3 class="text-lg">${user.username}</h3>#}
+{#          <a href="prosec?user_id=${user.id}" class="text-blue-500 view-profile-btn" data-user-id="${user.id}">مشاهده پروفایل</a> <!-- تغییر لینک به دکمه -->#}
+          {#<button class="bg-blue-500 text-white p-2 rounded follow-btn" data-user-id="${user.id}">فالو</button>#}
+{#        </div>#}
+{#      `;#}
+{#      resultsContainer.appendChild(resultItem);#}
+{##}
+      {#// اضافه کردن قابلیت فالو کردن#}
+      {#const followBtn = resultItem.querySelector('.follow-btn');#}
+      {#followBtn.addEventListener('click', () => handleFollow(user.id));#}
+{##}
+{#      // اضافه کردن عملکرد برای دکمه مشاهده پروفایل#}
+{#      const viewProfileBtn = resultItem.querySelector('.view-profile-btn');#}
+{#      viewProfileBtn.addEventListener('click', (e) => {#}
+{#        e.preventDefault(); // جلوگیری از تغییر لینک#}
+{#        displayUserProfile(user.id); // نمایش پروفایل کاربر#}
+{#      });#}
+{#    });#}
+{#  }});#}
+{#async function displayUserProfile(userId) {#}
+{#    try {#}
+{#      const response = await fetch(`http://127.0.0.1:8000/profile/${userId}/`, {#}
+{#        method: 'GET',#}
+{#        headers: {#}
+{#          "Authorization": `Bearer ${localStorage.getItem("access_token")}`,#}
+{#          "Content-Type": "application/json"#}
+{#        }#}
+{#      });#}
+{##}
+{#      if (!response.ok) throw new Error("خطا در دریافت اطلاعات کاربر");#}
+{##}
+{#      const user = await response.json();#}
+{#      const profile = user.profile;  // دریافت اطلاعات پروفایل#}
+{##}
+{#      document.getElementById('profile-fullname').textContent = profile.full_name || "نام نامشخص";#}
+{#      document.getElementById('profile-avatar').src = profile.avatar || 'https://via.placeholder.com/150';#}
+{#      document.getElementById('profile-username').textContent = `@${profile.username}`;#}
+{#      document.getElementById('profile-bio').textContent = profile.bio || "بیوگرافی وارد نشده";#}
+{#      document.getElementById('profile-age').textContent = profile.age ? `سن: ${profile.age}` : "سن وارد نشده";#}
+{##}
+{#      // نمایش پروفایل و مخفی کردن اکسپلور#}
+{#      document.getElementById('explore-section').classList.add('hidden');#}
+{#      document.getElementById('profile-section').classList.remove('hidden');#}
+{##}
+{#    } catch (error) {#}
+{#      console.error("خطا در دریافت اطلاعات پروفایل:", error);#}
+{#    }#}
+{#  }#}
+{#      </script>#}
+{##}
+{#</body>#}
+{#</html>#}
+
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="common.js"></script>
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+    <div class="flex justify-between">
+      <a href="http://127.0.0.1:8000/mypro/" class="bg-blue-500 text-white p-2 rounded">پروفایل</a>
+      <a href="http://127.0.0.1:8000/postha/" class="bg-blue-500 text-white p-2 rounded">پست‌ها</a>
+      <a href="http://127.0.0.1:8000/exp/" class="bg-blue-500 text-white p-2 rounded">اکسپلور</a>
+      <a href="http://127.0.0.1:8000/out/" class="bg-red-500 text-white p-2 rounded">خروج</a>
+    </div>
+
+    <!-- بخش جستجوی اکسپلور -->
+    <div id="explore-section" class="mt-10">
+      <div class="mb-6">
+        <input id="search-input" type="text" placeholder="جستجو بر اساس یوزرنیم" class="p-2 rounded border w-full">
+      </div>
+      <div id="search-results" class="space-y-4">
+        <!-- نتایج جستجو اینجا نمایش داده می‌شود -->
+      </div>
+    </div>
+
+    <!-- 🔹 بخش نمایش پروفایل (مخفی در ابتدا) -->
+    <div id="profile-section" class="hidden bg-white p-6 rounded shadow-md mt-6">
+      <button id="back-to-search" class="bg-gray-500 text-white px-4 py-2 rounded mb-4">بازگشت</button>
+      <div class="flex items-center space-x-4">
+        <img id="profile-avatar" src="" alt="Avatar" class="w-24 h-24 rounded-full">
+        <div>
+          <h2 id="profile-username" class="text-xl font-semibold"></h2>
+          <p id="profile-fullname" class="text-gray-700"></p>
+          <p id="profile-age" class="text-gray-600"></p>
+          <p id="profile-bio" class="text-gray-800"></p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // تابع برای استخراج `user_id` از Access Token
+      function parseJwt(token) {
+          try {
+              return JSON.parse(atob(token.split('.')[1])); // بخش Payload توکن
+          } catch (e) {
+              return null;
+          }
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const accessToken = localStorage.getItem("access_token");
+
+        // چک کردن وضعیت لاگین
+        if (!accessToken) {
+          document.getElementById('error-message').classList.remove('hidden');
+          return;
+        }
+
+        // استخراج `user_id` از توکن
+        const userData = parseJwt(accessToken);
+        const userId = userData ? userData.user_id : null;
+
+        if (!userId) {
+          console.error("شناسه کاربر یافت نشد!");
+          document.getElementById('error-message').classList.remove('hidden');
+          return;
+        }
+
+        // جستجوی کاربران و نمایش نتایج
+        document.getElementById('search-input').addEventListener('input', async (e) => {
+          const query = e.target.value.trim();
+          if (query.length < 3) {
+            document.getElementById('search-results').innerHTML = '';
+            return;
+          }
+
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/search/?search=${query}`, {
+              method: "GET",
+              headers: {
+                  "Authorization": `Bearer ${accessToken}`,
+                  "Content-Type": "application/json"
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error('خطا در جستجو');
+            }
+
+            const users = await response.json();
+            displaySearchResults(users);
+          } catch (error) {
+            console.error('خطا در جستجو:', error);
+          }
+        });
+
+        // نمایش نتایج جستجو در صفحه
+        function displaySearchResults(users) {
+          const resultsContainer = document.getElementById('search-results');
+          resultsContainer.innerHTML = ''; // پاک کردن نتایج قبلی
+
+          users.forEach(user => {
+            const avatarUrl = user.profile?.avatar || 'https://via.placeholder.com/150';
+
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('flex', 'items-center', 'space-x-4', 'border-b', 'py-2');
+
+            resultItem.innerHTML = `
+              <img src="${avatarUrl}" alt="Avatar" class="rounded-full w-12 h-12">
+              <div>
+                <h3 class="text-lg">${user.username}</h3>
+                <button class="text-blue-500 view-profile-btn" data-user-id="${user.id}">مشاهده پروفایل</button>
+              </div>
+            `;
+            resultsContainer.appendChild(resultItem);
+          });
+        }
+
+        // نمایش پروفایل کاربر
+        async function displayUserProfile(userId) {
+          try {
+              const response = await fetch(`http://127.0.0.1:8000/profile/${userId}/`, {
+                  method: "GET",
+                  headers: {
+                      "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                      "Content-Type": "application/json"
+                  }
+              });
+
+              if (!response.ok) {
+                  throw new Error("خطا در دریافت پروفایل");
+              }
+
+              const userProfile = await response.json();
+
+              // نمایش اطلاعات در صفحه
+              document.getElementById("profile-avatar").src = userProfile.avatar || 'https://via.placeholder.com/150';
+              document.getElementById("profile-username").textContent = `نام کاربری: ${userProfile.username}`;
+              document.getElementById("profile-fullname").textContent = `نام کامل: ${userProfile.full_name}`;
+              document.getElementById("profile-age").textContent = `سن: ${userProfile.age ? userProfile.age : "نامشخص"}`;
+              document.getElementById("profile-bio").textContent = `بیوگرافی: ${userProfile.bio ? userProfile.bio : "بیوگرافی ثبت نشده است"}`;
+
+              // نمایش بخش پروفایل و مخفی کردن جستجو
+              document.getElementById("profile-section").classList.remove("hidden");
+              document.getElementById("explore-section").classList.add("hidden");
+
+          } catch (error) {
+              console.error("خطا در دریافت پروفایل:", error);
+          }
+        }
+
+        // اضافه کردن قابلیت بازگشت به صفحه جستجو
+        document.getElementById("back-to-search").addEventListener("click", () => {
+          document.getElementById("profile-section").classList.add("hidden");
+          document.getElementById("explore-section").classList.remove("hidden");
+        });
+
+        // اضافه کردن عملکرد برای دکمه مشاهده پروفایل
+        document.addEventListener("click", (event) => {
+          if (event.target.classList.contains("view-profile-btn")) {
+              event.preventDefault();
+              const userId = event.target.dataset.userId;
+              // انتقال به صفحه پروفایل
+              window.location.href = `http://127.0.0.1:8000/prosec?user_id=${userId}`;
+          }
+        });
+
+      });
+    </script>
+  </div>
+</body>
+</html>
