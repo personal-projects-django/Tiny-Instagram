@@ -20,6 +20,8 @@ export default function MyProfilePage() {
   const [tab, setTab]       = useState<Tab>('posts')
   const [editMode, setEditMode] = useState(false)
   const [showPassForm, setShowPassForm] = useState(false)
+  const [passError, setPassError] = useState('')
+  const [passSuccess, setPassSuccess] = useState('')
   const [showStoryActivity, setShowStoryActivity] = useState(false)
   const fileRef             = useRef<HTMLInputElement>(null)
 
@@ -43,7 +45,7 @@ export default function MyProfilePage() {
     register: regPass,
     handleSubmit: handlePass,
     reset: resetPass,
-    formState: { isSubmitting: passSubmitting },
+    formState: { errors: passErrors, isSubmitting: passSubmitting },
   } = useForm<{ old_password: string; new_password: string }>()
 
   const onSaveProfile = async (data: any) => {
@@ -53,10 +55,16 @@ export default function MyProfilePage() {
     setEditMode(false)
   }
 
-  const onChangePassword = async (data: any) => {
-    await changePassword.mutateAsync(data)
-    resetPass()
-    setShowPassForm(false)
+  const onChangePassword = async (data: { old_password: string; new_password: string }) => {
+    setPassError('')
+    setPassSuccess('')
+    try {
+      const res = await changePassword.mutateAsync(data)
+      resetPass()
+      setPassSuccess(res?.detail || (fa ? 'رمز عبور تغییر کرد.' : 'Password changed.'))
+    } catch (err: any) {
+      setPassError(err?.response?.data?.detail || (fa ? 'تغییر رمز عبور انجام نشد.' : 'Password change failed.'))
+    }
   }
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +133,11 @@ export default function MyProfilePage() {
                   {fa ? 'ویرایش پروفایل' : 'Edit Profile'}
                 </button>
                 <button
-                  onClick={() => setShowPassForm(p => !p)}
+                  onClick={() => {
+                    setPassError('')
+                    setPassSuccess('')
+                    setShowPassForm(p => !p)
+                  }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <Lock size={14} />
@@ -203,18 +215,35 @@ export default function MyProfilePage() {
             <form onSubmit={handlePass(onChangePassword)} className="mt-4 space-y-3 p-4 bg-muted rounded-xl">
               <p className="text-sm font-medium text-foreground">{fa ? 'تغییر رمز عبور' : 'Change Password'}</p>
               {[
-                { name: 'old_password', label: fa ? 'رمز فعلی'   : 'Current password' },
-                { name: 'new_password', label: fa ? 'رمز جدید'   : 'New password'     },
+                { name: 'old_password', label: fa ? 'رمز فعلی'   : 'Current password', rules: { required: true } },
+                { name: 'new_password', label: fa ? 'رمز جدید'   : 'New password', rules: { required: true, minLength: 8 } },
               ].map(f => (
                 <div key={f.name}>
                   <label className="text-xs text-muted-foreground mb-1 block">{f.label}</label>
                   <input
-                    {...regPass(f.name as any, { required: true, minLength: 8 })}
+                    {...regPass(f.name as any, f.rules)}
                     type="password"
                     className="w-full h-9 px-3 rounded-lg bg-input border border-border text-foreground text-sm outline-none focus:ring-2 focus:ring-purple-500/40 transition-all"
                   />
+                  {passErrors[f.name as keyof typeof passErrors] && (
+                    <p className="mt-1 text-xs text-destructive">
+                      {f.name === 'new_password'
+                        ? (fa ? 'رمز جدید باید حداقل ۸ کاراکتر باشد.' : 'New password must be at least 8 characters.')
+                        : (fa ? 'رمز فعلی را وارد کنید.' : 'Current password is required.')}
+                    </p>
+                  )}
                 </div>
               ))}
+              {passError && (
+                <div className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {passError}
+                </div>
+              )}
+              {passSuccess && (
+                <div className="rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">
+                  {passSuccess}
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={passSubmitting}

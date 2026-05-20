@@ -11,6 +11,8 @@ export function useFollowToggle() {
       qc.invalidateQueries({ queryKey: ['user-search'] })
       qc.invalidateQueries({ queryKey: ['followers'] })
       qc.invalidateQueries({ queryKey: ['following'] })
+      qc.invalidateQueries({ queryKey: ['feed'] })
+      qc.invalidateQueries({ queryKey: ['story-feed'] })
     },
   })
 }
