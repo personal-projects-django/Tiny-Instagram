@@ -143,7 +143,7 @@ export default function ChatPage() {
       {/* Active room */}
       <main className={`${roomId ? 'flex' : 'hidden md:flex'} flex-1`}>
         {roomId ? (
-          <ChatRoom roomId={Number(roomId)} />
+          <ChatRoom key={roomId} roomId={Number(roomId)} />
         ) : (
           <div className="w-full flex flex-col items-center justify-center text-muted-foreground">
             <MessageCircle size={64} className="opacity-30 mb-4" />

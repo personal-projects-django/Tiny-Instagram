@@ -28,9 +28,11 @@ export default function StoryViewerPage() {
   const [storyIndex, setStoryIndex] = useState(0)
   const [progress, setProgress]     = useState(0)
   const [paused, setPaused]         = useState(false)
+  const [replyFocused, setReplyFocused] = useState(false)
   const [replyText, setReplyText]   = useState('')
   const [liked, setLiked]           = useState(false)
   const timerRef = useRef<number | undefined>(undefined)
+  const elapsedRef = useRef(0)
 
   const myStoryList = myStories?.results || myStories || []
   const viewerGroups = useMemo(() => {
@@ -71,17 +73,27 @@ export default function StoryViewerPage() {
     }
   }, [currentStory?.id])
 
+  const isPaused = paused || replyFocused || storyReply.isPending
+
+  useEffect(() => {
+    elapsedRef.current = 0
+    setProgress(0)
+  }, [currentStory?.id])
+
   // Progress timer
   useEffect(() => {
-    if (!currentStory || paused) return
-    setProgress(0)
-    const start = Date.now()
+    if (!currentStory || isPaused) return
+    const start = Date.now() - elapsedRef.current
 
     timerRef.current = window.setInterval(() => {
       const elapsed = Date.now() - start
-      const pct     = (elapsed / STORY_DURATION) * 100
+      elapsedRef.current = elapsed
+      const pct = (elapsed / STORY_DURATION) * 100
+
       if (pct >= 100) {
         clearInterval(timerRef.current)
+        elapsedRef.current = 0
+        setProgress(100)
         handleNext()
       } else {
         setProgress(pct)
@@ -89,7 +101,7 @@ export default function StoryViewerPage() {
     }, 50)
 
     return () => clearInterval(timerRef.current)
-  }, [storyIndex, groupIndex, paused])
+  }, [currentStory?.id, isPaused])
 
   const handleNext = () => {
     if (!currentGroup) return
@@ -129,6 +141,8 @@ export default function StoryViewerPage() {
     try {
       await storyReply.mutateAsync({ id: currentStory.id, text: replyText })
       setReplyText('')
+      setReplyFocused(false)
+      ;(e.currentTarget.querySelector('input') as HTMLInputElement | null)?.blur()
     } catch {}
   }
 
@@ -261,8 +275,8 @@ export default function StoryViewerPage() {
               <input
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
-                onFocus={() => setPaused(true)}
-                onBlur={() => setPaused(false)}
+                onFocus={() => setReplyFocused(true)}
+                onBlur={() => setReplyFocused(false)}
                 placeholder={fa ? 'پاسخ به استوری...' : 'Reply to story...'}
                 className="flex-1 h-10 px-4 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-white/50 text-sm outline-none focus:border-white/40"
               />

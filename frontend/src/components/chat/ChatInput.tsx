@@ -29,6 +29,12 @@ export default function ChatInput({ roomId, replyTo, onCancelReply }: Props) {
   const chunksRef   = useRef<Blob[]>([])
   const typingTimer = useRef<number | undefined>(undefined)
 
+  useEffect(() => {
+    setText('')
+    setShowEmojis(false)
+    setShowAttach(false)
+  }, [roomId])
+
   // typing event
   useEffect(() => {
     if (!text) return
@@ -38,17 +44,21 @@ export default function ChatInput({ roomId, replyTo, onCancelReply }: Props) {
   }, [text])
 
   const handleSend = async () => {
-    if (!text.trim()) return
+    const messageText = text.trim()
+    if (!messageText || sendMessage.isPending) return
+
     const payload: any = {
       room: roomId,
       type: 'text',
-      text,
+      text: messageText,
     }
     if (replyTo) payload.reply_to = replyTo.id
 
-    await sendMessage.mutateAsync(payload)
     setText('')
-    onCancelReply()
+    try {
+      await sendMessage.mutateAsync(payload)
+      onCancelReply()
+    } catch {}
   }
 
   const handleFileUpload = async (file: File, type: 'image' | 'video' | 'file') => {

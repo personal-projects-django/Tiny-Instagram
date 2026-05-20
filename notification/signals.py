@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
@@ -7,15 +9,27 @@ from follow.models import Follow, FollowRequest
 from story.models import StoryLike, StoryReply
 from chat.models import Message, MessageReaction, RoomMember
 
+logger = logging.getLogger(__name__)
+
 
 def create_notification(recipient, sender, notif_type, obj=None):
-    if recipient == sender:
-        return  # به خودت نوتیف نمیدی
-    kwargs = dict(recipient=recipient, sender=sender, type=notif_type)
-    if obj:
-        kwargs['content_type'] = ContentType.objects.get_for_model(obj)
-        kwargs['object_id']    = obj.pk
-    Notification.objects.create(**kwargs)
+    if not recipient or recipient == sender:
+        return
+
+    try:
+        kwargs = dict(recipient=recipient, sender=sender, type=notif_type)
+        if obj:
+            kwargs['content_type'] = ContentType.objects.get_for_model(obj)
+            kwargs['object_id'] = obj.pk
+        Notification.objects.create(**kwargs)
+    except Exception:
+        logger.exception(
+            'Failed to create notification type=%s recipient=%s sender=%s object=%s',
+            notif_type,
+            getattr(recipient, 'pk', None),
+            getattr(sender, 'pk', None),
+            getattr(obj, 'pk', None),
+        )
 
 
 # ===== پست =====

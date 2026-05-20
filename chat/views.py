@@ -1,4 +1,5 @@
 # chat/views.py
+import logging
 import os
 from django.http import FileResponse
 from asgiref.sync import async_to_sync
@@ -20,6 +21,8 @@ from chat.serializers import (
     StickerPackSerializer
 )
 from src.pagination import StandardPagination
+
+logger = logging.getLogger(__name__)
 
 
 # ===== Room =====
@@ -148,7 +151,7 @@ class MessageListView(generics.ListAPIView):
             id__in=deleted_ids
         ).select_related(
             'sender__profile', 'reply_to__sender', 'sticker'
-        ).prefetch_related('reactions__user', 'reads')
+        ).prefetch_related('reactions__user', 'reads').order_by('-created_at')
 
 
 class MessageSendView(APIView):
@@ -173,10 +176,13 @@ class MessageSendView(APIView):
         data = MessageSerializer(msg, context={'request': request}).data
         channel_layer = get_channel_layer()
         if channel_layer:
-            async_to_sync(channel_layer.group_send)(
-                f'chat_{room.id}',
-                {'type': 'chat_message', 'message': {'type': 'message', 'message': data}}
-            )
+            try:
+                async_to_sync(channel_layer.group_send)(
+                    f'chat_{room.id}',
+                    {'type': 'chat_message', 'message': {'type': 'message', 'message': data}}
+                )
+            except Exception:
+                logger.exception('Failed to broadcast chat message %s to room %s', msg.id, room.id)
 
         return Response(data, status=201)
 

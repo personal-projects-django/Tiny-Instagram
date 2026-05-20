@@ -281,13 +281,26 @@ export default function PostCard({ post }: Props) {
           {showComments && (
             <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
               {comments?.results?.map((c: any) => (
-                <div key={c.id} className="flex gap-2">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                    {c.user.username[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold text-foreground me-1">{c.user.username}</span>
-                    <span className="text-xs text-foreground">{c.text}</span>
+                <div key={c.id} className="flex items-start gap-2">
+                  <Link
+                    to={'/profile/' + c.user.username}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 overflow-hidden"
+                  >
+                    {c.user.avatar
+                      ? <img src={c.user.avatar} alt="" className="w-full h-full object-cover" />
+                      : c.user.username?.[0]?.toUpperCase()
+                    }
+                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      to={'/profile/' + c.user.username}
+                      className="block w-fit text-xs font-semibold text-foreground hover:underline"
+                    >
+                      {c.user.username}
+                    </Link>
+                    <p className="mt-0.5 text-xs text-foreground leading-relaxed whitespace-pre-wrap break-words">
+                      {c.text}
+                    </p>
                   </div>
                 </div>
               ))}

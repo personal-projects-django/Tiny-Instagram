@@ -43,8 +43,20 @@ export function useSendMessage() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: chatApi.sendMessage,
-    onSuccess : (_, vars: any) => {
+    onSuccess : (message: any, vars: any) => {
       const roomId = vars instanceof FormData ? Number(vars.get('room')) : vars.room
+
+      qc.setQueryData(['messages', roomId], (old: any) => {
+        if (!old) return old
+
+        const append = (items: any[]) =>
+          items.some((m: any) => m.id === message.id) ? items : [...items, message]
+
+        if (Array.isArray(old)) return append(old)
+        if (Array.isArray(old.results)) return { ...old, results: append(old.results) }
+        return old
+      })
+
       qc.invalidateQueries({ queryKey: ['messages', roomId] })
       qc.invalidateQueries({ queryKey: ['chat-room', roomId] })
       qc.invalidateQueries({ queryKey: ['chat-rooms'] })
