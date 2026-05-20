@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
+    --sidebar: 0 0% 98%;
+    --border: 0 0% 89%;
+    --accent: 270 50% 95%;
+    --accent-foreground: 270 50% 20%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 0 0% 89%;
+    --ring: 270 50% 60%;
+    --radius: 0.75rem;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --sidebar: 0 0% 7%;
+    --border: 0 0% 13%;
+    --accent: 270 20% 13%;
+    --accent-foreground: 270 50% 85%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 55%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 0 0% 13%;
+    --ring: 270 50% 60%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 95%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  /* فونت فارسی */
+  [lang="fa"], [dir="rtl"] {
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }

@@ -1,15 +1,15 @@
 from django.contrib import admin
 
-from follow.models import Friendship
+from follow.models import Follow,FollowRequest
 
 
-@admin.register(Friendship)
-class FriendshipAdmin(admin.ModelAdmin):
-    list_display = ['request_from', 'request_to', 'is_accepted', 'created_time']
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ['follower', 'following', 'created_at']
     actions = False
 
-    # def has_add_permission(self, request):
-    #     return False
+    def has_add_permission(self, request):
+        return False
 
-    # def has_delete_permission(self, request, obj=None):
-    #     return False
+    def has_delete_permission(self, request, obj=None):
+        return False
