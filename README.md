@@ -1,39 +1,58 @@
 # TinyInstagram
 
-TinyInstagram یک شبکه اجتماعی کوچک شبیه Instagram است که با Django REST Framework در backend و React/Vite در frontend ساخته شده است. پروژه فقط یک CRUD ساده نیست؛ احراز هویت JWT، پروفایل کاربر، پست چندرسانه‌ای، کامنت، لایک، ذخیره پست، فالو و درخواست فالو، استوری ۲۴ ساعته، اعلان‌ها و چت real-time با WebSocket را پوشش می‌دهد.
+TinyInstagram is a full-stack social media application inspired by Instagram. The backend is built with Django REST Framework, and the frontend is built with React, TypeScript, Vite, and Tailwind CSS. The project includes authentication, user profiles, posts, likes, comments, saved posts, follow requests, stories, notifications, and real-time chat over WebSockets.
 
-## تصاویر پروژه
+## Project Screenshots
 
-تصاویر زیر از مسیر `media/Pictures from the project` داخل خود پروژه نمایش داده می‌شوند:
+The screenshots below are loaded from `media/Pictures from the project` inside this repository.
 
-| Screenshot | Screenshot |
-| --- | --- |
-| ![TinyInstagram screenshot 1](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-26-42.png) | ![TinyInstagram screenshot 2](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-28-52.png) |
-| ![TinyInstagram screenshot 3](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-29-23.png) | ![TinyInstagram screenshot 4](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-29-28.png) |
-| ![TinyInstagram screenshot 5](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-30-04.png) | ![TinyInstagram screenshot 6](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-30-46.png) |
-| ![TinyInstagram screenshot 7](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-31-09.png) | ![TinyInstagram screenshot 8](media/Pictures%20from%20the%20project/Screenshot%20from%202026-05-21%2000-31-27.png) |
+<p align="center">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-26-42.png" alt="TinyInstagram screenshot 1" width="48%">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-28-52.png" alt="TinyInstagram screenshot 2" width="48%">
+</p>
 
-## قابلیت‌ها
+<p align="center">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-29-23.png" alt="TinyInstagram screenshot 3" width="48%">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-29-28.png" alt="TinyInstagram screenshot 4" width="48%">
+</p>
 
-- ثبت‌نام، ورود، خروج و refresh token با JWT
-- تایید حساب با OTP ایمیلی
-- ریست رمز عبور، تغییر رمز و حذف حساب
-- پروفایل اختصاصی با avatar، bio، نام، نام خانوادگی و private account
-- جستجوی کاربران و مشاهده پروفایل عمومی
-- ایجاد پست با چند رسانه، caption و سطح visibility
-- feed، explore، پست‌های کاربر، جزئیات پست و infinite scroll در frontend
-- لایک، کامنت، reply کامنت، حذف کامنت و غیرفعال کردن کامنت
-- ذخیره کردن پست‌ها و صفحه Saved
-- فالو، آنفالو، لیست followers/following و درخواست فالو برای حساب‌های خصوصی
-- استوری با تصویر یا ویدیو، انقضای ۲۴ ساعته، viewer list، like و reply
-- حذف خودکار استوری‌های منقضی‌شده با Celery Beat
-- notification برای لایک، کامنت، فالو، درخواست فالو، استوری و پیام
-- chat با room خصوصی، گروه، کانال، پیام متنی/فایل/تصویر/ویدیو/صدا/sticker/location
-- WebSocket chat با Django Channels و احراز هویت JWT
-- واکنش به پیام، read receipt، ویرایش پیام، حذف پیام، pin، search و download فایل پیام
-- frontend مدرن با React, TypeScript, Tailwind, React Query, Zustand, Radix UI و i18n
+<p align="center">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-30-04.png" alt="TinyInstagram screenshot 5" width="48%">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-30-46.png" alt="TinyInstagram screenshot 6" width="48%">
+</p>
 
-## تکنولوژی‌ها
+<p align="center">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-31-09.png" alt="TinyInstagram screenshot 7" width="48%">
+  <img src="Pictures from the project/Screenshot from 2026-05-21 00-31-27.png" alt="TinyInstagram screenshot 8" width="48%">
+</p>
+
+## Features
+
+- JWT-based register, login, logout, and token refresh flow
+- Email OTP verification for new accounts
+- Password reset, password change, and account deletion
+- Custom user model with email login
+- User profile with avatar, bio, first name, last name, age, and private account support
+- User search and public profile pages
+- Post creation with multiple media files
+- Post visibility levels: public, followers, and private
+- Feed, explore, user posts, post detail, and infinite scroll in the frontend
+- Likes, comments, comment replies, comment deletion, and disabled comments
+- Saved posts and a dedicated saved posts page
+- Follow and unfollow flow
+- Follow requests for private accounts
+- Story creation with image or video
+- 24-hour story expiration
+- Story viewers, story likes, and story replies
+- Scheduled cleanup of expired stories with Celery Beat
+- Notifications for likes, comments, follows, follow requests, stories, and messages
+- Real-time chat rooms with WebSocket support
+- Private rooms, groups, and channels
+- Text, file, image, video, audio, voice, sticker, GIF, and location messages
+- Message read receipts, reactions, edit history, delete options, pinning, search, and file download
+- Modern React frontend with React Query, Zustand, Radix UI, Tailwind CSS, i18n, and Lucide icons
+
+## Tech Stack
 
 ### Backend
 
@@ -45,7 +64,8 @@ TinyInstagram یک شبکه اجتماعی کوچک شبیه Instagram است ک
 - Redis
 - Django Channels
 - Daphne
-- Celery و django-celery-beat
+- Celery
+- django-celery-beat
 - django-redis
 - django-cors-headers
 - Pillow
@@ -60,201 +80,202 @@ TinyInstagram یک شبکه اجتماعی کوچک شبیه Instagram است ک
 - TanStack React Query
 - Zustand
 - Axios
-- React Hook Form و Zod
+- React Hook Form
+- Zod
 - Radix UI
 - Lucide React
 - Framer Motion
 - i18next
 
-## معماری پروژه
+## Project Structure
 
 ```text
 maktab119-TinyInstagram/
-├── account/          # کاربر سفارشی، OTP، پروفایل، auth API
-├── post/             # پست، رسانه پست، کامنت، لایک، ذخیره پست
-├── follow/           # follow/unfollow و follow request
-├── story/            # استوری، like، reply، viewer و task حذف استوری
-├── notification/     # اعلان‌های generic برای رویدادهای مختلف
-├── chat/             # room، message، sticker، WebSocket consumer و chat API
-├── src/              # تنظیمات اصلی Django، ASGI/WSGI، urls، celery، pagination
-├── frontend/         # اپ React/Vite
-├── media/            # فایل‌های آپلود شده کاربران و نمونه تصاویر پروژه
-├── static/           # CSS و assetهای static سمت Django
-└── templates/        # قالب‌های قدیمی Django template
+├── account/          # Custom user, OTP, profile, and auth APIs
+├── post/             # Posts, post media, comments, likes, and saved posts
+├── follow/           # Follow, unfollow, and follow request logic
+├── story/            # Stories, likes, replies, viewers, and story cleanup task
+├── notification/     # Generic notifications for project events
+├── chat/             # Rooms, messages, stickers, WebSocket consumer, and chat APIs
+├── src/              # Django settings, URLs, ASGI/WSGI, Celery, and pagination
+├── frontend/         # React/Vite frontend application
+├── media/            # Uploaded files and project screenshots
+├── static/           # Django static CSS and assets
+└── templates/        # Older Django template pages
 ```
 
-## مدل‌های اصلی
+## Main Data Models
 
 ### Account
 
-- `User`: مدل کاربر سفارشی با email به عنوان `USERNAME_FIELD`، username یکتا، phone، وضعیت verified/private/active/staff و متد تولید JWT.
-- `OTP`: کد تایید ۶ رقمی برای email که بعد از ۳ دقیقه منقضی می‌شود.
-- `Profile`: اطلاعات عمومی کاربر مثل bio، avatar، first name، last name و age.
+- `User`: Custom user model. Email is used as the login field. It also stores username, phone number, verification status, privacy status, and staff/active flags.
+- `OTP`: One-time email verification code that expires after three minutes.
+- `Profile`: Public profile information such as avatar, bio, first name, last name, and age.
 
 ### Post
 
-- `Post`: مالک پست، caption، visibility شامل `public`، `followers` و `private`، وضعیت active و comments disabled.
-- `PostMedia`: فایل‌های image/video هر پست با thumbnail، ترتیب، ابعاد، duration، size و mime type.
-- `Comment`: کامنت و reply تودرتو با وضعیت approval.
-- `Like`: لایک یکتای کاربر روی پست.
-- `SavedPost`: ذخیره پست توسط کاربر.
-- `CommentLike`: واکنش کاربر به کامنت.
+- `Post`: Stores owner, caption, visibility, active status, comment settings, and timestamps.
+- `PostMedia`: Stores post images and videos with thumbnail, order, dimensions, duration, file size, MIME type, and processing status.
+- `Comment`: Supports normal comments and nested replies.
+- `Like`: Keeps one like per user per post.
+- `SavedPost`: Keeps one saved record per user per post.
+- `CommentLike`: Keeps one reaction per user per comment.
 
 ### Follow
 
-- `Follow`: رابطه follower/following با constraint یکتا.
-- `FollowRequest`: درخواست فالو با وضعیت `pending`، `accepted` یا `rejected`.
+- `Follow`: Stores follower and following relationships with a unique constraint.
+- `FollowRequest`: Handles pending, accepted, and rejected follow requests.
 
 ### Story
 
-- `Story`: استوری تصویر/ویدیو با caption، viewer list، زمان انقضا و محاسبه active بودن.
-- `StoryLike`: reaction روی استوری.
-- `StoryReply`: reply خصوصی به صاحب استوری.
+- `Story`: Stores image/video story content, caption, viewers, expiration time, and creation time.
+- `StoryLike`: Stores story reactions.
+- `StoryReply`: Stores private replies to stories.
 
 ### Notification
 
-- `Notification`: اعلان generic با `GenericForeignKey` برای اتصال به Post، Comment، Story، Message و سایر آبجکت‌ها.
+- `Notification`: Uses a generic relation so notifications can point to posts, comments, stories, messages, and other objects.
 
 ### Chat
 
-- `Room`: چت خصوصی، گروه یا کانال.
-- `RoomMember`: عضویت کاربر در room با نقش owner/admin/member/subscriber.
-- `Message`: پیام با typeهای text، image، video، audio، file، sticker، gif، location و voice.
-- `MessageRead`: read receipt.
-- `MessageReaction`: واکنش ایموجی روی پیام.
-- `MessageEditHistory`: تاریخچه ویرایش پیام.
-- `DeletedMessageForUser`: حذف پیام فقط برای یک کاربر.
-- `StickerPack`، `Sticker` و `UserStickerPack`: مدیریت stickerها.
+- `Room`: Supports private chats, groups, and channels.
+- `RoomMember`: Stores membership and role per user in a room.
+- `Message`: Supports many message types, replies, forwarded objects, attachments, location, link preview metadata, and status fields.
+- `MessageRead`: Tracks who has read a message.
+- `MessageReaction`: Stores emoji reactions on messages.
+- `MessageEditHistory`: Stores message edit history.
+- `DeletedMessageForUser`: Supports deleting a message only for one user.
+- `StickerPack`, `Sticker`, and `UserStickerPack`: Handle sticker packs and user-installed sticker libraries.
 
-## API اصلی
+## API Overview
 
-تمام endpointهای backend زیر prefix `/api/` قرار دارند.
+All backend endpoints are mounted under `/api/`.
 
-### Account
+### Account Endpoints
 
-| Method | Endpoint | توضیح |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/api/account/register/` | ثبت‌نام کاربر |
-| `POST` | `/api/account/verify-otp/` | تایید OTP |
-| `POST` | `/api/account/resend-otp/` | ارسال دوباره OTP |
-| `POST` | `/api/account/login/` | ورود و دریافت JWT |
-| `POST` | `/api/account/logout/` | خروج |
-| `POST` | `/api/account/token/refresh/` | refresh کردن access token |
-| `POST` | `/api/account/password-reset/` | درخواست ریست رمز |
-| `POST` | `/api/account/password-confirm/` | ثبت رمز جدید |
-| `POST` | `/api/account/password-change/` | تغییر رمز کاربر لاگین‌شده |
-| `DELETE` | `/api/account/delete-account/` | حذف حساب |
-| `GET/PATCH` | `/api/account/me/` | دریافت یا ویرایش پروفایل من |
-| `GET` | `/api/account/search/` | جستجوی کاربران |
-| `GET` | `/api/account/<username>/` | پروفایل عمومی |
+| `POST` | `/api/account/register/` | Register a new user |
+| `POST` | `/api/account/verify-otp/` | Verify the OTP code |
+| `POST` | `/api/account/resend-otp/` | Resend the OTP code |
+| `POST` | `/api/account/login/` | Log in and receive JWT tokens |
+| `POST` | `/api/account/logout/` | Log out |
+| `POST` | `/api/account/token/refresh/` | Refresh the access token |
+| `POST` | `/api/account/password-reset/` | Request password reset |
+| `POST` | `/api/account/password-confirm/` | Set a new password |
+| `POST` | `/api/account/password-change/` | Change the current password |
+| `DELETE` | `/api/account/delete-account/` | Delete the current account |
+| `GET/PATCH` | `/api/account/me/` | Read or update the current profile |
+| `GET` | `/api/account/search/` | Search users |
+| `GET` | `/api/account/<username>/` | Read a public profile |
 
-### Post
+### Post Endpoints
 
-| Method | Endpoint | توضیح |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/api/post/` | ایجاد پست |
-| `GET` | `/api/post/feed/` | feed کاربران دنبال‌شده |
-| `GET` | `/api/post/explore/` | explore |
-| `GET` | `/api/post/saved/` | پست‌های ذخیره‌شده |
-| `GET` | `/api/post/user/<username>/` | پست‌های یک کاربر |
-| `GET/PATCH/DELETE` | `/api/post/<id>/` | جزئیات، ویرایش یا حذف پست |
-| `POST` | `/api/post/<post_id>/like/` | toggle لایک |
-| `GET/POST` | `/api/post/<post_id>/comments/` | لیست یا ایجاد کامنت |
-| `DELETE` | `/api/post/comments/<comment_id>/delete/` | حذف کامنت |
-| `POST` | `/api/post/<post_id>/save/` | toggle ذخیره پست |
+| `POST` | `/api/post/` | Create a post |
+| `GET` | `/api/post/feed/` | Get the feed |
+| `GET` | `/api/post/explore/` | Get explore posts |
+| `GET` | `/api/post/saved/` | Get saved posts |
+| `GET` | `/api/post/user/<username>/` | Get posts by username |
+| `GET/PATCH/DELETE` | `/api/post/<id>/` | Read, update, or delete a post |
+| `POST` | `/api/post/<post_id>/like/` | Toggle post like |
+| `GET/POST` | `/api/post/<post_id>/comments/` | List or create comments |
+| `DELETE` | `/api/post/comments/<comment_id>/delete/` | Delete a comment |
+| `POST` | `/api/post/<post_id>/save/` | Toggle saved post |
 
-### Follow
+### Follow Endpoints
 
-| Method | Endpoint | توضیح |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `/api/follow/suggested/` | کاربران پیشنهادی |
-| `GET/POST` | `/api/follow/requests/` | لیست یا ایجاد درخواست فالو |
-| `PATCH/DELETE` | `/api/follow/requests/<request_id>/` | مدیریت درخواست فالو |
-| `POST` | `/api/follow/<username>/follow/` | follow/unfollow |
-| `GET` | `/api/follow/<username>/followers/` | لیست followers |
-| `GET` | `/api/follow/<username>/following/` | لیست following |
+| `GET` | `/api/follow/suggested/` | Get suggested users |
+| `GET/POST` | `/api/follow/requests/` | List or create follow requests |
+| `PATCH/DELETE` | `/api/follow/requests/<request_id>/` | Manage a follow request |
+| `POST` | `/api/follow/<username>/follow/` | Follow or unfollow a user |
+| `GET` | `/api/follow/<username>/followers/` | List followers |
+| `GET` | `/api/follow/<username>/following/` | List following users |
 
-### Story
+### Story Endpoints
 
-| Method | Endpoint | توضیح |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `/api/story/` | feed استوری |
-| `GET` | `/api/story/me/` | استوری‌های من |
-| `GET` | `/api/story/archive/` | آرشیو استوری‌های من |
-| `GET` | `/api/story/replies/` | replyهای استوری‌های من |
-| `POST` | `/api/story/create/` | ایجاد استوری |
-| `GET` | `/api/story/<story_id>/` | جزئیات استوری |
-| `DELETE` | `/api/story/<story_id>/delete/` | حذف استوری |
-| `POST` | `/api/story/<story_id>/like/` | like/reaction استوری |
-| `POST` | `/api/story/<story_id>/reply/` | reply به استوری |
-| `GET` | `/api/story/<story_id>/viewers/` | بینندگان استوری |
-| `GET` | `/api/story/<story_id>/likers/` | لایک‌کنندگان استوری |
+| `GET` | `/api/story/` | Get story feed |
+| `GET` | `/api/story/me/` | Get my stories |
+| `GET` | `/api/story/archive/` | Get my story archive |
+| `GET` | `/api/story/replies/` | Get replies to my stories |
+| `POST` | `/api/story/create/` | Create a story |
+| `GET` | `/api/story/<story_id>/` | Read story details |
+| `DELETE` | `/api/story/<story_id>/delete/` | Delete a story |
+| `POST` | `/api/story/<story_id>/like/` | Like or react to a story |
+| `POST` | `/api/story/<story_id>/reply/` | Reply to a story |
+| `GET` | `/api/story/<story_id>/viewers/` | List story viewers |
+| `GET` | `/api/story/<story_id>/likers/` | List story likers |
 
-### Notification
+### Notification Endpoints
 
-| Method | Endpoint | توضیح |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `/api/notification/` | لیست اعلان‌ها |
-| `GET` | `/api/notification/unread-count/` | تعداد اعلان خوانده‌نشده |
-| `POST` | `/api/notification/read-all/` | خواندن همه اعلان‌ها |
-| `POST` | `/api/notification/<id>/read/` | خواندن یک اعلان |
+| `GET` | `/api/notification/` | List notifications |
+| `GET` | `/api/notification/unread-count/` | Get unread count |
+| `POST` | `/api/notification/read-all/` | Mark all notifications as read |
+| `POST` | `/api/notification/<id>/read/` | Mark one notification as read |
 
-### Chat
+### Chat Endpoints
 
-| Method | Endpoint | توضیح |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET/POST` | `/api/chat/rooms/` | لیست یا ایجاد room |
-| `GET/PATCH/DELETE` | `/api/chat/rooms/<id>/` | جزئیات یا مدیریت room |
-| `GET/POST` | `/api/chat/rooms/<room_id>/members/` | اعضای room |
-| `GET` | `/api/chat/rooms/<room_id>/messages/` | پیام‌های room |
-| `GET` | `/api/chat/rooms/<room_id>/messages/search/` | جستجوی پیام‌ها |
-| `POST` | `/api/chat/messages/send/` | ارسال پیام |
-| `PATCH` | `/api/chat/messages/<message_id>/edit/` | ویرایش پیام |
-| `DELETE` | `/api/chat/messages/<message_id>/delete/` | حذف پیام |
-| `POST` | `/api/chat/messages/<message_id>/pin/` | pin/unpin پیام |
-| `POST` | `/api/chat/messages/<message_id>/read/` | ثبت خوانده‌شدن پیام |
-| `POST` | `/api/chat/messages/<message_id>/reaction/` | reaction روی پیام |
-| `GET` | `/api/chat/messages/<message_id>/download/` | دانلود فایل پیام |
-| `GET` | `/api/chat/stickers/` | لیست sticker packها |
-| `POST` | `/api/chat/stickers/<pack_id>/install/` | نصب sticker pack |
+| `GET/POST` | `/api/chat/rooms/` | List or create rooms |
+| `GET/PATCH/DELETE` | `/api/chat/rooms/<id>/` | Read or manage a room |
+| `GET/POST` | `/api/chat/rooms/<room_id>/members/` | List or manage room members |
+| `GET` | `/api/chat/rooms/<room_id>/messages/` | List room messages |
+| `GET` | `/api/chat/rooms/<room_id>/messages/search/` | Search messages |
+| `POST` | `/api/chat/messages/send/` | Send a message |
+| `PATCH` | `/api/chat/messages/<message_id>/edit/` | Edit a message |
+| `DELETE` | `/api/chat/messages/<message_id>/delete/` | Delete a message |
+| `POST` | `/api/chat/messages/<message_id>/pin/` | Pin or unpin a message |
+| `POST` | `/api/chat/messages/<message_id>/read/` | Mark a message as read |
+| `POST` | `/api/chat/messages/<message_id>/reaction/` | React to a message |
+| `GET` | `/api/chat/messages/<message_id>/download/` | Download a message file |
+| `GET` | `/api/chat/stickers/` | List sticker packs |
+| `POST` | `/api/chat/stickers/<pack_id>/install/` | Install a sticker pack |
 
-### WebSocket
+## WebSocket
 
 ```text
 ws://127.0.0.1:8000/ws/chat/<room_id>/
 ```
 
-اتصال WebSocket از `JWTAuthMiddleware` استفاده می‌کند و توسط Django Channels در `src/asgi.py` route می‌شود.
+WebSocket traffic is routed through Django Channels in `src/asgi.py`. The chat connection uses `JWTAuthMiddleware`.
 
-## صفحات frontend
+## Frontend Routes
 
-| Route | صفحه |
+| Route | Page |
 | --- | --- |
-| `/login` | ورود |
-| `/register` | ثبت‌نام |
-| `/forgot` | فراموشی رمز |
-| `/` | feed اصلی |
+| `/login` | Login |
+| `/register` | Register |
+| `/forgot` | Forgot password |
+| `/` | Main feed |
 | `/explore` | Explore |
-| `/me` | پروفایل من |
-| `/profile/:username` | پروفایل عمومی |
-| `/notifications` | اعلان‌ها |
-| `/stories/create` | ایجاد استوری |
-| `/stories/:username` | مشاهده استوری |
-| `/chat` | لیست گفتگوها |
-| `/chat/:roomId` | room چت |
-| `/post/:id` | جزئیات پست |
-| `/saved` | پست‌های ذخیره‌شده |
+| `/me` | My profile |
+| `/profile/:username` | Public profile |
+| `/notifications` | Notifications |
+| `/stories/create` | Create story |
+| `/stories/:username` | Story viewer |
+| `/chat` | Chat list |
+| `/chat/:roomId` | Chat room |
+| `/post/:id` | Post detail |
+| `/saved` | Saved posts |
 
-## پیش‌نیازها
+## Requirements
 
-- Python 3.10 یا جدیدتر
-- Node.js و npm
+- Python 3.10 or newer
+- Node.js and npm
 - PostgreSQL
 - Redis
 
-## متغیرهای محیطی
+## Environment Variables
 
-یک فایل `.env` در ریشه پروژه نیاز است. مقدارهای واقعی را مطابق سیستم خودتان قرار دهید:
+Create a `.env` file in the project root:
 
 ```env
 SECRET_KEY=your-secret-key
@@ -272,7 +293,7 @@ EMAIL_HOST_USER=your-email@example.com
 EMAIL_HOST_PASSWORD=your-email-password
 ```
 
-## نصب backend
+## Backend Setup
 
 ```bash
 cd /home/kianjavk/maktab119-TinyInstagram
@@ -284,29 +305,29 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-در ویندوز فعال‌سازی virtualenv معمولاً به این شکل است:
+On Windows, activate the virtual environment with:
 
 ```bash
 .venv\Scripts\activate
 ```
 
-## نصب frontend
+## Frontend Setup
 
 ```bash
 cd /home/kianjavk/maktab119-TinyInstagram/frontend
 npm install
 ```
 
-## اجرای پروژه در حالت توسعه
+## Running the Project
 
-ابتدا Redis را اجرا کنید:
+Start Redis:
 
 ```bash
 sudo systemctl start redis-server
 redis-cli ping
 ```
 
-Celery worker:
+Start the Celery worker:
 
 ```bash
 cd /home/kianjavk/maktab119-TinyInstagram
@@ -314,7 +335,7 @@ source .venv/bin/activate
 celery -A src worker -l info
 ```
 
-Celery Beat برای taskهای زمان‌بندی‌شده مثل حذف استوری‌های منقضی:
+Start Celery Beat for scheduled tasks:
 
 ```bash
 cd /home/kianjavk/maktab119-TinyInstagram
@@ -322,7 +343,7 @@ source .venv/bin/activate
 celery -A src beat -l info
 ```
 
-Backend ASGI با Daphne:
+Start the ASGI backend with Daphne:
 
 ```bash
 cd /home/kianjavk/maktab119-TinyInstagram
@@ -330,14 +351,14 @@ source .venv/bin/activate
 daphne -b 0.0.0.0 -p 8000 src.asgi:application
 ```
 
-Frontend:
+Start the frontend:
 
 ```bash
 cd /home/kianjavk/maktab119-TinyInstagram/frontend
 npm run dev
 ```
 
-آدرس‌های اصلی:
+Main URLs:
 
 ```text
 Frontend: http://localhost:5173/
@@ -345,17 +366,17 @@ Django Admin: http://127.0.0.1:8000/admin/
 API Base: http://127.0.0.1:8000/api/
 ```
 
-## اسکریپت‌ها
+## Scripts
 
-در ریشه پروژه:
+Root project:
 
 ```bash
 npm run dev
 ```
 
-این دستور Tailwind مربوط به templateهای Django را watch می‌کند و خروجی را در `static/css/style.css` می‌سازد.
+This watches the Django-template Tailwind input file and writes the output to `static/css/style.css`.
 
-در `frontend/`:
+Frontend project:
 
 ```bash
 npm run dev
@@ -364,17 +385,18 @@ npm run lint
 npm run preview
 ```
 
-## نکات پیاده‌سازی
+## Implementation Notes
 
-- backend به صورت پیش‌فرض از PostgreSQL استفاده می‌کند؛ تنظیم SQLite در `src/settings.py` کامنت شده است.
-- `REST_FRAMEWORK` احراز هویت پیش‌فرض را JWT قرار داده و pagination سفارشی از `src.pagination.StandardPagination` استفاده می‌کند.
-- CORS برای `localhost:5173`، `localhost:5174` و `localhost:3000` فعال است.
-- Redis هم برای Channels و هم برای cache/Celery استفاده می‌شود.
-- اگر پکیج `channels_redis` موجود نباشد، پروژه به `InMemoryChannelLayer` fallback می‌کند.
-- استوری‌ها با `expires_at` کنترل می‌شوند و task `story.tasks.delete_expired_stories` هر ساعت اجرا می‌شود.
-- frontend از `/api` به عنوان base URL استفاده می‌کند و Vite باید requestها را به backend proxy کند.
-- interceptor در `frontend/src/api/client.ts` توکن JWT را به requestها اضافه می‌کند و در پاسخ 401 تلاش می‌کند access token را refresh کند.
+- The backend uses PostgreSQL by default. The SQLite configuration is commented out in `src/settings.py`.
+- Django REST Framework uses JWT authentication by default.
+- Pagination is configured through `src.pagination.StandardPagination`.
+- CORS allows `localhost:5173`, `localhost:5174`, and `localhost:3000`.
+- Redis is used for Channels, cache, and Celery.
+- If `channels_redis` is not installed, the app falls back to `InMemoryChannelLayer`.
+- Stories are controlled by `expires_at` and cleaned by `story.tasks.delete_expired_stories` every hour.
+- The frontend uses `/api` as the base API URL.
+- `frontend/src/api/client.ts` attaches JWT access tokens to requests and attempts token refresh after a `401` response.
 
 ## License
 
-این پروژه فایل `LICENSE` دارد و متن license در همان فایل قابل مشاهده است.
+This project includes a `LICENSE` file. See that file for license details.
